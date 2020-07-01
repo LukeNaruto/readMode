@@ -1,0 +1,53 @@
+{
+  "name"            : "9",
+  "default_locale"  : "en",
+  "version"         : "1.0.0",
+  "short_name"      : "XBRead",
+  "description"     : "__MSG_extension_desc__",
+  "icons" : {
+    "16"            : "assets/images/icon16.png",
+    "48"            : "assets/images/icon48.png",
+    "128"           : "assets/images/icon128.png"
+  },
+  "permissions"     : [
+    "contextMenus",
+    "tabs",
+    "storage",
+    "tts",
+    "<all_urls>",
+    "chrome://favicon/"
+  ],
+  
+  "background": {
+    "scripts"       : [ "/bundle/common.js", "/bundle/background.js" ]
+  },
+  "content_scripts" : [
+    {
+      "matches"     : [ "http://*/*", "https://*/*", "file:///*/*.txt", "file:///*/*.md" ],
+      "exclude_matches": [ "http://localhost/*" ],
+      "js"          : [
+        "/bundle/common.js",
+        "/bundle/vendors.js",
+        "/bundle/contentscripts.js"
+       ],
+      "run_at"      : "document_end"
+    }
+  ],
+  
+  "page_action"     : {
+    "default_icon"  : {
+      "16"          : "assets/images/icon16.png"
+    },
+    "default_popup": "/popup.html"
+  },
+  "web_accessible_resources": [
+    "/assets/images/*",
+    "/assets/font/*",
+    "website_list.json",
+    "options/corb.html"
+  ],
+  "homepage_url": "https://www.minibai.com",
+  "offline_enabled" : true,
+  "content_security_policy" : "script-src 'self' 'unsafe-eval' https://ssl.google-analytics.com; object-src 'self'",
+  "manifest_version": 2
+}

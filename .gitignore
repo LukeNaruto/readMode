@@ -1,0 +1,20 @@
+# for common
+node_modules/**
+publish/**
+.vscode/**
+
+# for chrome
+src/bundle/**
+
+# for firefox
+ext/website_list.json
+ext/bundle/**
+ext/focus/**
+ext/read/**
+ext/module/**
+ext/options/**
+ext/assets/**
+ext/_locales/**
+
+# for mac
+**/.DS_Store

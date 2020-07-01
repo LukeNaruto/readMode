@@ -1,0 +1,12 @@
+html,body{
+  width: 280px;
+  background: transparent;
+
+}
+*{
+  padding: 0;
+  margin: 0;
+}
+#renderBox{
+  background: red;
+}
