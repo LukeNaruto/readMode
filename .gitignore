@@ -2,7 +2,7 @@
 node_modules/**
 publish/**
 .vscode/**
-
+.history
 # for chrome
 src/bundle/**
 
