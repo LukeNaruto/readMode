@@ -393,5 +393,5 @@ function pRead() {
     pr.AddPlugin( puplugin.Plugin() );
     pr.Getsites();
     storage.puread = pr;
-    console.log( "current puread object is   ", JSON.parse(JSON.stringify(pr)),storage )
+    console.log( "current puread object is   ", JSON.parse(JSON.stringify(pr)), JSON.parse(JSON.stringify(storage)),storage )
 }

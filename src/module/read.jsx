@@ -98,11 +98,23 @@ export default class ReadOpt extends React.Component {
             
         }); */
     }
+    changePreload(v){
+        storage.read.preload = v;
+        storage.Write(()=>{
+            console.log(storage);
+            
+            this.setState(pre=>({
+                ...pre,
+                preload: storage.read.preload
+            }));
+        })
+    }
     
     constructor( props ) {
         super( props );
         this.state = {
-            whitelist: storage.read.whitelist
+            whitelist: storage.read.whitelist,
+            preload: storage.read.preload
         }
     }
     componentDidMount(){
@@ -113,9 +125,10 @@ export default class ReadOpt extends React.Component {
                 console.log(1,storage.read.whitelist.toString());
                 storage.Read(()=>{
                     console.log(2,storage.read.whitelist.toString());
-                    this.setState({
+                    this.setState(pre=>({
+                        ...pre,
                         whitelist: storage.read.whitelist
-                    });
+                    }));
                 })
             }
             
@@ -155,11 +168,10 @@ export default class ReadOpt extends React.Component {
                 
 
                 <sr-opt-gp>
-                    <Switch width="100%" checked={ false }
+                    <Switch width="100%" checked={ this.state.preload }
                         thumbedColor="#fff" trackedColor="#008eff"
                         label="自动拼页"
-                        onChange={ val=>{} }
-                        disable={true} />
+                        onChange={ val=>this.changePreload(val) } />
                 </sr-opt-gp>
                 <sr-opt-gp>
                     <Switch width="100%" checked={ isWhite }

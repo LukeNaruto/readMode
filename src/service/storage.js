@@ -64,8 +64,9 @@ const name = "simpread",
         exclusion : [
             "v2ex.com","issue.github.com","readme.github.com","question.zhihu.com","douban.com","nationalgeographic.com.cn","tech.163.com","docs.microsoft.com","msdn.microsoft.com","baijia.baidu.com","code.oschina.net","http://www.ifanr.com","http://www.ifanr.com/news","http://www.ifanr.com/app","http://www.ifanr.com/minapp","http://www.ifanr.com/dasheng","http://www.ifanr.com/data","https://www.ifanr.com/app","http://www.ifanr.com/weizhizao","http://www.thepaper.cn","http://www.pingwest.com","http://tech2ipo.com","https://www.waerfa.com/social"
         ],
+        preload: false,
         fontsize  : "18",  // default 62.5%
-        layout    : "1000",  // default 20%
+        layout    : "1000px",  // default 20%
         //sites     : [],  // e.g. [ "<url>", site ]
         custom    : {
             // remove by 1.1.1

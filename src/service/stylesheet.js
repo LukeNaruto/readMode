@@ -70,9 +70,10 @@ function opacity( opacity ) {
  * @param {string} font family name e.g. PingFang SC; Microsoft Yahei
  */
 function fontFamily( family ) {
-    console.log('fontFamily-----', family);
+    console.log('fontFamily-----',$( "#read_container_" ), family);
     
-    $( "sr-read" ).css( "font-family", family == "default" ? "" : family );
+    $( "#read_container_" ).get(0).style.setProperty("--font-family", family == "default" ? "" : family)
+    // css( "--font-family", family == "default" ? "" : family );
 }
 
 /**
@@ -97,7 +98,8 @@ function fontSize( value ) {
 function layout( width ) {
     console.log('layout-----', width);
     
-    $( "sr-read" ).css( "width", width ? width : "" );
+    $( "#read_container_" ).get(0).style.setProperty("--container-width", width ? width : "");
+    // $( "sr-read" ).css( "width", width ? width : "" );
 }
 
 /**

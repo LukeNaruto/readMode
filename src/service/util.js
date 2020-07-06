@@ -264,6 +264,59 @@ function getPageInfo() {
     return { url, title: title.trim(), favicon, img, desc: desc.trim() };
 }
 
+function txt2HtmlAppend2Dom(domStr,site){
+    const {include, paging, exclude, title} = site;
+    let $DOM = $(domStr);
+    $DOM.find(formatSelector(exclude)).remove();
+    const includeDOM = $DOM.find(formatSelector(include)).html();
+    const bool = /^(\[\[\{)([\S\s]*)(\}\]\])$/.test(paging[1].next);
+
+    let nextUrl = '';
+    const h = RegExp.$2;
+    console.log(h,RegExp.$2);
+    
+    const handleStr = (h).split('.attr');
+    if(handleStr.length == 2 && bool){
+        const dir = handleStr[1].replace(/^\(\'|\'\)$/g,'') || '';
+        console.log(handleStr,dir);
+        nextUrl = $DOM.find(formatSelector(eval(handleStr[0]))).attr(dir);
+    }
+    
+    console.log(RegExp.$2,paging[1].next);
+    const titleTxt = $DOM.find(formatSelector(title)).text();
+
+    console.log($DOM.find('body'), $DOM.find(formatSelector(include)));
+    
+    console.log($DOM, $DOM.find('#j_chapterNext'));
+    return {
+        include: includeDOM,
+        next: nextUrl,
+        title: titleTxt,
+
+    }
+}
+
+//"<div class='read-content'>" => div.read-content
+function formatSelector(domStr){
+    console.log(domStr);
+    
+    const dom = $(domStr);
+    if(!dom[0]) return null;
+    console.log(dom.attr('class'));
+    
+    const tag = dom[0].nodeName.toLowerCase(),
+        classStr = dom.attr('class'),
+        classNames = classStr ? classStr.split(' ') : [],
+        idStr = dom.attr('id') || '',
+        class_ = classNames.length ? '.' + classNames.join('.') : '',
+        id_ = idStr ? '#' + idStr : '',
+        result = tag + id_ + class_;
+        console.log(result);
+        
+    return result;
+
+}
+
 export {
     verifyHtml     as verifyHtml,
     html2enml      as HTML2ENML,
@@ -276,4 +329,5 @@ export {
     blacklist      as Blacklist,
     lazyload       as Lazyload,
     getPageInfo    as GetPageInfo,
+    txt2HtmlAppend2Dom as Txt2HtmlAppend2Dom,
 }

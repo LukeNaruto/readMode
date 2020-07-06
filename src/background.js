@@ -219,6 +219,17 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
     switch ( request.type ) {
         
         
+        case msg.MESSAGE_ACTION.notify_preload:
+            const { url } = request.value;
+            console.log(storage, url);
+            fetch('http:' + url)
+            .then(response => response.text())
+            .catch(error => console.error('Error:', error))
+            .then(response => {
+                console.log('Success:', response)
+                sendResponse(response);
+            });
+            break;
         case msg.MESSAGE_ACTION.get_read_mode:
             const name = "simpread";
             browser.storage.local.get( [name], result => {
@@ -266,7 +277,9 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
             watch.Push( request.value.type, request.value.value );
             break;
         case msg.MESSAGE_ACTION.save_verify:
-            sendResponse( watch.Lock( request.value.url ));
+            getCurTab( { "active": true, "currentWindow": true },tabs=>{
+                sendResponse( watch.Lock( request.value.url, tabs[0].id ));
+            });
             break;
         case msg.MESSAGE_ACTION.auth:
             browser.tabs.create({ url: browser.extension.getURL( "options/options.html#labs?auth=" + request.value.name.toLowerCase() ) });

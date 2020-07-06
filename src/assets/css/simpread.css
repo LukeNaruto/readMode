@@ -45,7 +45,8 @@
 sr-read {
     display: -webkit-flex;
     flex-flow:column nowrap;
-
+    font-family: var(--font-family);
+    width: var(--container-width);
     margin: 40px auto;
     max-width: 1200px;
     padding: 0 60px;

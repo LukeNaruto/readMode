@@ -48,20 +48,15 @@ function pull( tabid ) {
  * @param  {string} url
  * @return {object} return wacher item, when url exist tabs status is lock( true ), else is unlock( false )
  */
-function lock( url ) {
+function lock( url,tabid ) {
     try {
-        console.log(668,{
-            site   : [ ...watcher.site.values()   ].includes( url ),
-            import : [ ...watcher.import.values() ].includes( url ),
-            version: [ ...watcher.version.values()].includes( url ),
-            option : [ ...watcher.option.values() ].includes( url ),
-        });
+        console.log(668, url,tabid,[ ...watcher.site.keys()   ]);
         
         return {
-            site   : [ ...watcher.site.values()   ].includes( url ),
-            import : [ ...watcher.import.values() ].includes( url ),
-            version: [ ...watcher.version.values()].includes( url ),
-            option : [ ...watcher.option.values() ].includes( url ),
+            site   : [ ...watcher.site.values()   ].includes( url ) && [ ...watcher.site.keys()   ].includes( tabid ),
+            import : [ ...watcher.import.values() ].includes( url ) && [ ...watcher.import.keys() ].includes( tabid ),
+            version: [ ...watcher.version.values()].includes( url ) && [ ...watcher.version.keys()].includes( tabid ),
+            option : [ ...watcher.option.values() ].includes( url ) && [ ...watcher.option.keys() ].includes( tabid ),
         };
     } catch( error ) {
         console.error( "watch.Lock has same failed, ", error );

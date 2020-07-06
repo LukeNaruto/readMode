@@ -8,7 +8,7 @@ import * as setting       from 'setting';
 import * as se            from 'siteeditor';
 import * as kbd           from 'keyboard';
 import * as fb            from 'feedback';
-
+import {Txt2HtmlAppend2Dom} from 'util';
 import { storage, Clone } from 'storage';
 import th                 from 'theme';
 import * as ss            from 'stylesheet';
@@ -57,9 +57,35 @@ const Footer = () => {
         </sr-rd-footer>
     )
 }
+const SrRead = (props) => {
+    const {wrapper} = props;
+    const Page    = wrapper.paging && wrapper.paging.length > 0 && 
+        <spec.Paging paging={ wrapper.paging } />;
+    const Article = wrapper.avatar && wrapper.avatar.length > 0 ? 
+        <spec.Multiple include={ wrapper.include } avatar={ wrapper.avatar } /> :
+        <sr-rd-content dangerouslySetInnerHTML={{__html: wrapper.include }} ></sr-rd-content>;
+
+    return (
+        <sr-read>
+            {/* <ProgressBar show={ read.progress } /> */}
+            <sr-rd-title>{ wrapper.title }</sr-rd-title>
+            {/* <sr-rd-desc>{ wrapper.desc }</sr-rd-desc> */}
+            <sr-rd-hostname>{location.hostname}</sr-rd-hostname>
+            { Article }
+            {/* { Page    } */}
+            {/* <Footer /> */}
+            
+        </sr-read>
+    )
+}
 
 class Read extends React.Component {
-
+    constructor(props){
+        super();
+        this.state = {
+            htmls: props.htmls
+        }
+    }
     verifyContent() {
         console.log(98765);
         
@@ -122,7 +148,10 @@ class Read extends React.Component {
     
         let scrollCount = 0;
         let unshakeTimer = null;
-
+        let locked = false;
+        const paging = this.props.wrapper.paging;
+        const this_ = this;
+        let nextUrl = Array.isArray(paging) ? paging[1].next : '';
         $root
             .addClass( "simpread-font" )
             .addClass( theme )
@@ -141,12 +170,34 @@ class Read extends React.Component {
                         if(scrollTemp) $('sr-rd-crlbar').addClass('scrolling');
                         scrollCount = scrollTemp;
                     },100);
+                    //todo
+                    const preload = storage.read.preload;
+                    // console.log(preload,!locked && paging && paging.length > 0 && preload, paging);
+                    
+                    if(!locked && paging && paging.length > 0 && preload){
+                        const clientH = $('#read_container_').height() + 40;
+                        const scrollT = $( rdclsjq ).scrollTop() + $( ".simpread-read-root" ).height() * 2;
+                        // console.log(storage);
+                        
+                        if(scrollT > clientH){
+                            locked = true;
+                            browser.runtime.sendMessage(msg.Add( msg.MESSAGE_ACTION.notify_preload, {url: nextUrl }),function(res){
+                                // console.log(res);
+                                const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
+                                // console.log(nextContent,this_.state.htmls);
+                                this_.setState((pre)=>({
+                                    htmls:[...pre.htmls, nextContent]
+                                }),()=>{
+                                    nextUrl = nextContent.next;
+                                    // console.log(99999,nextUrl);
+                                    locked = false;
+                                });
+                            });
+                        }
+                    }
                 })
                 .on('click', function(){
                     $('sr-rd-crlbar').css({'marginTop': 0});
-                    console.log(33333,storage);
-                    
-                    browser.runtime.sendMessage( {type:333333});
                 });
 
         this.props.read.fontfamily && ss.FontFamily( this.props.read.fontfamily );
@@ -180,7 +231,6 @@ class Read extends React.Component {
             tips.Render( storage.option.plugins );
             tips.Help( storage.statistics );
         }, 50 );
-        $('#read_container_').on('scroll',this.scrollCtrl)
     }
 
     componentWillUnmount() {
@@ -194,7 +244,6 @@ class Read extends React.Component {
         $( "body" ).removeClass( "simpread-hidden" );
         $( rdclsjq ).remove();
         tooltip.Exit( rdclsjq );
-        $('#read_container_').unbind('scroll')
     }
 
     /**
@@ -278,16 +327,7 @@ class Read extends React.Component {
    exit() {
         Exit();
     }
-    scrollCtrl(){
-
-    }
     render() {
-        const Article = this.props.wrapper.avatar && this.props.wrapper.avatar.length > 0 ? 
-                        <spec.Multiple include={ this.props.wrapper.include } avatar={ this.props.wrapper.avatar } /> :
-                        <sr-rd-content dangerouslySetInnerHTML={{__html: this.props.wrapper.include }} ></sr-rd-content>;
-
-        const Page    = this.props.wrapper.paging && this.props.wrapper.paging.length > 0 && 
-                        <spec.Paging paging={ this.props.wrapper.paging } />;
         return (
             <div id="read_container_" style={{width: '100%'}}>
                 <ReadCtlbar show={ this.props.read.controlbar } 
@@ -295,23 +335,20 @@ class Read extends React.Component {
                             type={ this.props.wrapper.name }
                             site={{ title: this.props.wrapper.title, url: window.location.href }} 
                             custom={ this.props.read.custom } onAction={ (t,v,c)=>this.onAction( t,v,c ) }/>
-                <sr-read>
-                        
-                    {/* <ProgressBar show={ this.props.read.progress } /> */}
-                    <sr-rd-title>{ this.props.wrapper.title }</sr-rd-title>
-                    {/* <sr-rd-desc>{ this.props.wrapper.desc }</sr-rd-desc> */}
-                    <sr-rd-hostname>{location.hostname}</sr-rd-hostname>
-                    { Article }
-                    {/* { Page    } */}
-                    {/* <Footer /> */}
-                    
-                </sr-read>
+                {/* todo2 */}
+                {
+                    this.state.htmls.map(html => (
+                        <SrRead wrapper={html} />
+                    ))
+                }
+                
             </div>
             
         )
     }
 
 }
+
 
 /**
  * Render entry
@@ -329,11 +366,11 @@ function Render( callMathjax = true ) {
         storage.pr.Readability();
         storage.pr.ReadMode();
     } else console.warn( '=== Normal Read mode ===' )
-    
+    storage.pr.htmls = [storage.pr.html];
     console.log(JSON.parse(JSON.stringify(storage)));
     console.warn( "=== Current PuRead object is ===", storage.pr )
     console.warn( "=== Current PuRead object is ===", storage.current )
-    ReactDOM.render( <Read read={ storage.current } wrapper={ storage.pr.html } />, getReadRoot() );
+    ReactDOM.render( <Read read={ storage.current } wrapper={ storage.pr.html } htmls={storage.pr.htmls} />, getReadRoot() );
 }
 
 /**
