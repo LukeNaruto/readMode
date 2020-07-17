@@ -82,8 +82,11 @@ const SrRead = (props) => {
 class Read extends React.Component {
     constructor(props){
         super();
+        const paging = props.wrapper.paging;
         this.state = {
-            htmls: props.htmls
+            htmls: props.htmls,
+            locked: false,
+            nextUrl: Array.isArray(paging) ? paging[1].next : '',
         }
     }
     verifyContent() {
@@ -148,10 +151,9 @@ class Read extends React.Component {
     
         let scrollCount = 0;
         let unshakeTimer = null;
-        let locked = false;
-        const paging = this.props.wrapper.paging;
+        
         const this_ = this;
-        let nextUrl = Array.isArray(paging) ? paging[1].next : '';
+        this_.renderPreload(this_);
         $root
             .addClass( "simpread-font" )
             .addClass( theme )
@@ -171,30 +173,7 @@ class Read extends React.Component {
                         scrollCount = scrollTemp;
                     },100);
                     //todo
-                    const preload = storage.read.preload;
-                    // console.log(preload,!locked && paging && paging.length > 0 && preload, paging);
-                    
-                    if(!locked && paging && paging.length > 0 && preload){
-                        const clientH = $('#read_container_').height() + 40;
-                        const scrollT = $( rdclsjq ).scrollTop() + $( ".simpread-read-root" ).height() * 2;
-                        // console.log(storage);
-                        
-                        if(scrollT > clientH){
-                            locked = true;
-                            browser.runtime.sendMessage(msg.Add( msg.MESSAGE_ACTION.notify_preload, {url: nextUrl }),function(res){
-                                // console.log(res);
-                                const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
-                                // console.log(nextContent,this_.state.htmls);
-                                this_.setState((pre)=>({
-                                    htmls:[...pre.htmls, nextContent]
-                                }),()=>{
-                                    nextUrl = nextContent.next;
-                                    // console.log(99999,nextUrl);
-                                    locked = false;
-                                });
-                            });
-                        }
-                    }
+                    this_.renderPreload(this_)
                 })
                 .on('click', function(){
                     $('sr-rd-crlbar').css({'marginTop': 0});
@@ -231,6 +210,38 @@ class Read extends React.Component {
             tips.Render( storage.option.plugins );
             tips.Help( storage.statistics );
         }, 50 );
+    }
+
+    async renderPreload(this_) {
+        let {locked, nextUrl} = this.state;
+        const preload = storage.read.preload;
+        const paging = this.props.wrapper.paging;
+        // console.log(preload,locked, !locked && paging && paging.length > 0 && preload, paging);
+
+        if (!locked && paging && paging.length > 0 && preload) {
+            const clientH = $('#read_container_').height() + 40;
+            const scrollT = $(rdclsjq).scrollTop() + $(".simpread-read-root").height() * 2;
+            const pageLittle = $('#read_container_').height() < $(".simpread-read-root").height();
+            // console.log(storage);
+            if (scrollT > clientH || pageLittle) {
+                await this_.setState((pre) => ({
+                    ...pre,
+                    locked: true,
+                }));
+                browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.notify_preload, { url: nextUrl }), function (res) {
+                    // console.log(res);
+                    const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
+                    // console.log(nextContent,this_.state.htmls);
+                     this_.setState((pre) => ({
+                        ...pre,
+                        htmls: [...pre.htmls, nextContent],
+                        locked: false,
+                        nextUrl: nextContent.next,
+                    }));
+                });
+            }
+        }
+        // console.log('locked', locked);
     }
 
     componentWillUnmount() {

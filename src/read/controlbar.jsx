@@ -197,8 +197,6 @@ export default class ReadCtlbar extends React.Component {
         // hack code
         !/chrome/ig.test( navigator.userAgent ) && ( delete readItems.dyslexia );
     }
-
-
     render() {
         const Controlbar = <Fap items={ [ "样式"] } 
             autoHide={ false }

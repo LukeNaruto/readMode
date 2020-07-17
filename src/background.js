@@ -222,12 +222,12 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
         case msg.MESSAGE_ACTION.notify_preload:
             const { url } = request.value;
             console.log(storage, url);
-            fetch('http:' + url)
+            url && fetch('http:' + url)
             .then(response => response.text())
             .catch(error => console.error('Error:', error))
             .then(response => {
                 console.log('Success:', response)
-                sendResponse(response);
+                response && sendResponse(response);
             });
             break;
         case msg.MESSAGE_ACTION.get_read_mode:

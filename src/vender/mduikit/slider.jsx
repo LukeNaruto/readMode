@@ -434,7 +434,7 @@ export default class Slider extends React.Component {
                     data-tooltip={ tooltip.text ? tooltip.text : this.props[ tooltip.target ] } data-tooltip-position={ tooltip.position } data-tooltip-delay={ tooltip.delay }>
                 <span className={`fap-tool iconfont ${minIcon}`} style={{fontSize}} onClick={()=>this.onTextChange(false)}>{mintext}</span>
                 <sl-group style={ style.group }>
-                    <input ref="range" type="range" min={this.props.min} max={this.props.max} step={this.props.step} onChange={ evt=> this.onChange(evt) } onMouseUp={ evt=>this.onMouseUp(evt)}/>
+                    <input ref="range" type="range" min={this.props.min} max={this.props.max} step={this.props.step} onChange={ evt=> this.onChange(evt) } onMouseUp={ evt=>this.onMouseUp(evt)} />
                     <line ref="line" style={ style.line }></line>
                 </sl-group>
                 <span className={`fap-tool iconfont ${maxIcon}`} style={{fontSize}} onClick={()=>this.onTextChange(true)}>{maxtext}</span>

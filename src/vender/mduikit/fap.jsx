@@ -11,7 +11,7 @@
  */
 
 console.log( "==== simpread component: Floating Action Panel ====" )
-
+import { storage } from 'storage';
 const cssinjs = () => {
     const spec_color = 'rgba(244, 67, 54, 1)',
           normal_color= 'rgba(245, 82, 70, .8)',
@@ -114,7 +114,7 @@ const cssinjs_panel = () => {
               flexDirection: 'column',
 
               position: 'absolute',
-              right: '-40px',
+              right: '30px',
               top: '40px',
 
               
@@ -307,7 +307,7 @@ class Panel extends React.Component {
                                 </panel-border>
                         </panel-tab>;
              }), */
-             tabs          = <panel-tab 
+            /*  tabs          = <panel-tab 
                                 style={ style.panel_tab } 
                                 active={ "true" } 
                                 { ...events } >
@@ -315,7 +315,7 @@ class Panel extends React.Component {
                                 <panel-border 
                                     style={ active_border }>
                                     </panel-border>
-                            </panel-tab>,
+                            </panel-tab>, */
              /* groups         = this.props.children.map( ( child, idx ) => {
                 return <panel-group 
                             style={ idx == 0 ? active_group : { ...style.group } } 
@@ -382,6 +382,88 @@ const Button = ( props ) => {
     )
 };
 
+class AudioBox extends React.Component{
+    constructor(props){
+        super();
+        this.state = {
+            playA: props.playA,
+        }
+    }
+    audioUnShackeTimer = null;
+    len = 0;
+    oIdx = 0;
+    fence = 2;
+    playFn(type){
+        
+        console.log('clearTimeout--');
+        
+        clearTimeout(this.audioUnShackeTimer);
+        this.audioUnShackeTimer = setTimeout(()=>{
+            this.props.audioSocket(type, type === 'play' ? !this.state.playA : undefined);
+            this.setState({
+                playA: type === 'play' ? !this.state.playA : true,
+            });  
+        },200);
+        
+    }
+    lineRepaint(val){
+        const {len, oIdx, fence, props:{options:{pointer, step}}} = this;
+        const maxWidth = $(this.refs.line).width();
+        const count = (val - pointer) / step;
+        const itemWidth = (maxWidth - fence) / len;
+        const width = itemWidth * Math.abs(count) + fence;
+        const left = (oIdx + (count >= 0 ? 0 : count )) * itemWidth;
+        $(this.refs.lineBg).css({width,left}).removeClass('toLeft');
+        if(count < 0){
+            $(this.refs.lineBg).addClass('toLeft');
+        }
+        
+        $(this.refs.range).attr('title', val + 'X').val(val);
+    }
+    onChange(ev){
+        console.log(ev.target.value,$(this.refs.range));
+        this.lineRepaint(ev.target.value);
+        this.props.onChange && this.props.onChange( ev.target.value );
+    }
+    componentWillMount(){
+        const {min, max, step, pointer} = this.props.options;
+        this.oIdx = (pointer - min) / step;
+        this.len = (max - min) / step;
+        console.log(storage.read);
+    }
+    componentDidMount() {
+        this.lineRepaint(this.props.value);
+    }
+    render(){
+        const {state: {playA}, props:{desc,options:{min, max, step}}, len, fence} = this;
+        return (
+            <div className="audio-box">
+                <span onClick={()=>{$('panel-bg').click();}} className="close iconfont icon-closepx"></span>
+                <div className="play-settings">
+                    <span onClick={()=>{this.playFn('pre')}} className="pre-audio"><i className="iconfont icon-voice-set-backoff-16px"></i></span>
+                    <span onClick={()=>{this.playFn('play')}} className="middle-audio"><i className={`iconfont ${playA ? 'icon-voice-suspend-20px' : 'icon-voice-play-20px'}`}></i></span>
+                    <span onClick={()=>{this.playFn('next')}} className="next-audio"><i className="iconfont icon-voice-set-forward-16px"></i></span>
+                </div>
+                <play-rate>
+                    <play-label>{desc}</play-label>
+                    <play-goup>
+                        <input ref="range" onChange={ evt=> this.onChange(evt) } min={min} max={max} step={step} type="range" />
+                        <line ref="line">
+                            {
+                                Array(len).fill('').map((v,i)=>(
+                                    <line-item style={{width: `calc((100% - ${fence}px * ${len + 1}) / ${len})`, marginLeft: `${fence}px`}}></line-item>
+                                ))
+                            }
+                            <line-bg ref="lineBg" />
+                        </line>
+
+                    </play-goup>
+                </play-rate>
+            </div>
+        )
+    }
+}
+
 /**
  * Custom component: Floating Action Panel, component e.g.
  * 
@@ -438,7 +520,17 @@ export default class Fap extends React.Component {
         },
         waves       : undefined,
     };
-
+    audio = new Audio();
+    audioUnShackeTimer = null;
+    catchCount = 0;
+    count = 0;
+    
+    audioOptions = {
+        min: .5,
+        max: 1.75,
+        step: .25,
+        pointer: 1
+    }
     static propTypes = {
         item        : React.PropTypes.array,   // panel props
         autoHeight  : React.PropTypes.bool,    // panel props
@@ -456,49 +548,68 @@ export default class Fap extends React.Component {
     constructor(){
         super();
         this.state = {
-            btn_group: {
-                voice:{
-                    title: '朗读页面（敬请期待）',
-                    icon: 'voice',
-                    c: 'icon-menu-voice-18px',
-                    click: ()=>{}
-                },
-                print:{
-                    title: '打印',
-                    icon: 'print',
-                    c: 'icon-menu-Printing-18px',
-                    click: ()=>{
-                        window.print();
-                    }
-                },
-                F11:{
-                    title: '全屏',
-                    icon: 'F11',
-                    c: 'icon-menu-Full-screen-18px',
-                    click: ()=>{
-                        document.documentElement.requestFullscreen();
-                    }
-                },
-                setting:{
-                    title: '阅读模式样式设置',
-                    icon: 'setting',
-                    c: 'icon-menu-set-18px',
-                    click: (event)=>{
-                        this.panelRender( $( this.refs.setting ) );
-                    }
-                },
-                close:{
-                    title: '退出阅读模式',
-                    icon: 'close',
-                    c: 'icon-menu-close-18px',
-                    click: (event)=>{
-                        if ( this.props.onAction ) this.props.onAction( event, 'exit' );
-                    }
-                }
-            },
+            active: '',
+            playA: false,
+            count: 0,
         }
     }
 
+    _btn_group = {
+        voice:{
+            title: '朗读页面',
+            icon: 'voice',
+            c: 'icon-menu-voice-18px',
+            click: ()=>{
+                this.setState((preState)=>({
+                    ...preState,
+                    active: 'voice'
+                }),()=>{
+                    this.audioRender();
+                });
+            }
+        },
+        print:{
+            title: '打印',
+            icon: 'print',
+            c: 'icon-menu-Printing-18px',
+            click: ()=>{
+                window.print();
+            }
+        },
+        F11:{
+            title: '全屏',
+            icon: 'F11',
+            c: 'icon-menu-Full-screen-18px',
+            click: ()=>{
+                document.documentElement.requestFullscreen();
+            }
+        },
+        setting:{
+            title: '阅读模式样式设置',
+            icon: 'setting',
+            c: 'icon-menu-set-18px',
+            click: (event)=>{
+                this.setState((preState)=>({
+                    ...preState,
+                    active: 'setting'
+                }),()=>{
+                    this.panelRender();
+                });
+            }
+        },
+        close:{
+            title: '退出阅读模式',
+            icon: 'close',
+            c: 'icon-menu-close-18px',
+            click: (event)=>{
+                console.log(this.audio);
+                this.audio.pause();
+                this.audio = null;
+
+                if ( this.props.onAction ) this.props.onAction( event, 'exit' );
+            }
+        }
+    };
     style = cssinjs()
 
     btnClickHandler( event ) {
@@ -514,7 +625,7 @@ export default class Fap extends React.Component {
         if ( type == "spec" ) {
             $target.parent().css({ ...style.spec, ...style.spec_focus });
         } else {
-            this.panelRender( $( this.refs.bg ) );
+            this.panelRender(  );
         }
     }
 
@@ -532,41 +643,133 @@ export default class Fap extends React.Component {
         // todo
         if ( event.target.tagName.toLowerCase() == "panel-bg" ) {
             const $panelbg = $( this.refs.bg ),
-                  style    = { ...this.style },
-                  $setting = $( this.refs.setting );
-
+                  style    = { ...this.style };
             ReactDOM.unmountComponentAtNode( $panelbg[0] );
-            ReactDOM.unmountComponentAtNode( $setting[0] );
             $panelbg.css({ ...style.panel_bg });
-            $(this.refs.setting).removeClass('active');
-            /* $panelbg.animate({ opacity: 0 },{
+            $(this.refs[this.state.active]).removeClass('active');
+            $panelbg.animate({ opacity: 0 },{
                 complete: ()=> {
                     ReactDOM.unmountComponentAtNode( $panelbg[0] );
                     $panelbg.css({ ...style.panel_bg });
-
-                    // ReactDOM.unmountComponentAtNode( $setting[0] );
-                    // $panelbg.css({ ...style.panel_bg });
                 }
-            }); */
+            });
         }
     }
-
-    panelRender( $panelbg ) {
+    audioGetText(count){
+        const {audio, catchCount} = this;
+        const text = $('sr-rd-content > *')[count] ? $('sr-rd-content > *')[count].innerText.trim() : '';
+        if(text){
+            const url = "//tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + encodeURI(text);
+            audio.src = url;
+            audio.playbackRate = storage.read.playbackRate;
+            this.setState((preState)=>({
+                ...preState,
+                playA: false,
+            }));
+        }else{
+            const type = catchCount > count ? 'pre' : 'next';
+            this.audioSwitch(type);
+        }
+    }
+    runAudio(revise){
+        this.setState((preState)=>({
+            ...preState,
+            playA: revise === undefined ? !preState.playA : revise,
+        }),async ()=>{
+            const {audio,count,catchCount, state:{playA}} = this;
+            
+            console.log(2, playA, this.state.playA);
+            if(playA){
+                const distance = $('html').height() * .5;
+                const offsetTop = $('sr-rd-content > *').get(count).offsetTop + $('sr-rd-content > *').get(count).clientHeight * .5;
+                $('.simpread-read-root').scrollTop(offsetTop - distance);
+                await setTimeout(()=>{
+                    $('sr-rd-content > *').eq(count).addClass('audioReading');
+                    audio.play().catch(err=>{
+                        const type = catchCount > count ? 'pre' : 'next';
+                        console.log(321,audio.readyState, err)
+                        this.audioSwitch(type);
+                    })
+                    this.catchCount = count;
+                },200);
+            }else{
+                $('sr-rd-content > *').eq(count).removeClass('audioReading');
+                audio.pause();
+            };
+        });
+    }
+    audioSwitch(type){
+        const max = $('sr-rd-content > *').length;
+        let {count, audio} = this;
+        $('sr-rd-content > *').eq(count).removeClass('audioReading');
+        audio.pause();
+        // this.catchCount = count;
+        if(type === 'pre'){
+            count = --count >=0 ? count : 0;
+        }else if(type === 'next'){
+            if(++count >= max) count = max - 1;
+            console.log(audio.readyState, audio.duration,audio.networkState);
+            console.log('audioSwitch--next', count, max);
+        }
+        this.count = count;
+        this.audioGetText(this.count);
+        this.runAudio();
+    }
+    audioSocket(type, revise){
+        console.log('revise--',revise);
+        
+        switch(type){
+            case 'play':
+                this.runAudio(revise);
+                break;
+            default:
+                this.audioSwitch(type);
+                break;
+        }
+    }
+    changeAudioRate(val){
+        const {audio} = this;
+        console.log('changeAudioRate--',val);
+        storage.read.playbackRate = val;
+        storage.Write();
+        audio.playbackRate = val;
+        
+    }
+    audioRender(){
+        const $panelbg = $( this.refs.bg );
+        const {audio} = this;
         if ( $panelbg.length > 0 ) {
             const style = { ...this.style };
-            const $panelbg_ = $( this.refs.bg );
-            $panelbg_.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
-            $panelbg.addClass('active');
+            $(this.refs[this.state.active]).addClass('active');
+            $panelbg.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
+            ReactDOM.render( 
+                <AudioBox value={audio.playbackRate} desc="倍速" options={this.audioOptions} playA={this.state.playA} onChange={(v)=>this.changeAudioRate(v)} audioSocket={(type, revise) => this.audioSocket(type,revise)} />, $panelbg[0] );
+        }
+    }
+    panelRender() {
+        const $panelbg = $( this.refs.bg );
+        if ( $panelbg.length > 0 ) {
+            const style = { ...this.style };
+            $(this.refs[this.state.active]).addClass('active');
+            $panelbg.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
             ReactDOM.render( 
                 <Panel 
-                    { ...this.props } 
-                    onOpen={ ()=>this.onPop( "onOpen" ) } 
-                    onClose={ ()=>this.onPop( "onClose" ) }/>, $panelbg[0] );
+                    { ...this.props } />, $panelbg[0] );
         }
     }
 
     onPop( type ) {
         this.props[type] && this.props[type]();
+    }
+    componentDidMount(){
+        const {audio} = this;
+        this.audioGetText(0);
+        audio.onended = () => {
+            const {count} = this;
+            const max = $('sr-rd-content > *').length;
+            if(max >= count + 2 )this.audioSwitch('next');
+            console.log('ending');
+        }
     }
     render() {
         const style = { ...this.style };
@@ -596,7 +799,7 @@ export default class Fap extends React.Component {
         spec   = <Button { ...btn_props( "exit", "spec",     style.spec,   this.props.triggerItems.exit,   style.icon, {target: "name", delay: 50}, this.props.waves ) } />,
         anchor = <Button { ...btn_props( "anchor", "anchor", style.origin, this.props.triggerItems.anchor, style.icon, {target: "name", delay: 50}, this.props.waves ) } />,
         panelBg  = <panel-bg ref="bg"></panel-bg>;
-        const tools = Object.values(this.state.btn_group).map(item => {
+        const tools = Object.values(this._btn_group).map(item => {
             const imgURL = chrome.extension.getURL(`assets/images/icons/${item.icon}.png`);
             return (
                 <span className={`fap-tool iconfont ${item.c}`}
