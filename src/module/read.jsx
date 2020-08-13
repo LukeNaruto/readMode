@@ -159,7 +159,7 @@ export default class ReadOpt extends React.Component {
                 </sr-opt-gp>
                 <sr-opt-gp>
                     <sr-opt-label>版面宽度</sr-opt-label>
-                    <Slider min="720" max="1200" step="10" icontexts={[700, 1200]} width={slider_width} value={ this.parse( this.props.option.layout == "" ? "1000" : this.props.option.layout ) } onChange={ (v)=>this.changeLayout(v) }/>
+                    <Slider min="720" max="1200" step="10" icontexts={[720, 1200]} width={slider_width} value={ this.parse( this.props.option.layout == "" ? "1000" : this.props.option.layout ) } onChange={ (v)=>this.changeLayout(v) }/>
                 </sr-opt-gp>
                 <sr-opt-gp>
                     <sr-opt-label>主题色</sr-opt-label>

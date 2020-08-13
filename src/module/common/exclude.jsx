@@ -10,7 +10,7 @@ export default class Exclude extends React.Component {
     }
 
     static propType = {
-        flag : React.PropTypes.object,
+        flag : PropTypes.object,
     }
 
     state = {

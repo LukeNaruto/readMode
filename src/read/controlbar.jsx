@@ -35,7 +35,7 @@ const tooltip_options = {
 export default class ReadCtlbar extends React.Component {
 
     static propTypes = {
-        onAction: React.PropTypes.func,
+        onAction: PropTypes.func,
     }
 
     verify( type ) {

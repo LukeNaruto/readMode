@@ -215,10 +215,10 @@ class ListView extends React.Component {
     };
 
     static propTypes = {
-        waves           : React.PropTypes.string,
-        items           : React.PropTypes.array,
-        active          : React.PropTypes.string,
-        onChange        : React.PropTypes.func,
+        waves           : PropTypes.string,
+        items           : PropTypes.array,
+        active          : PropTypes.string,
+        onChange        : PropTypes.func,
     };
 
     style = cssinjs_list()
@@ -302,20 +302,20 @@ export default class AC extends React.Component {
 
     static propTypes = {
         // input
-        color       : React.PropTypes.string,
-        value       : React.PropTypes.string,
-        placeholder : React.PropTypes.string,
-        floating    : React.PropTypes.string,
-        items       : React.PropTypes.array,
+        color       : PropTypes.string,
+        value       : PropTypes.string,
+        placeholder : PropTypes.string,
+        floating    : PropTypes.string,
+        items       : PropTypes.array,
         // dropdown
-        activeColor : React.PropTypes.string,
-        hoverColor  : React.PropTypes.string,
+        activeColor : PropTypes.string,
+        hoverColor  : PropTypes.string,
         borderColor : undefined,
         focusColor  : undefined,
 
-        tooltip     : React.PropTypes.object,
+        tooltip     : PropTypes.object,
         // event
-        onChange    : React.PropTypes.func,
+        onChange    : PropTypes.func,
     }
 
     style = cssinjs()

@@ -19,10 +19,10 @@ export default class LabsOpt extends React.Component {
     }
 
     static propTypes = {
-        option : React.PropTypes.object,
-        read   : React.PropTypes.object,
-        focus  : React.PropTypes.object,
-        onChange : React.PropTypes.func,
+        option : PropTypes.object,
+        read   : PropTypes.object,
+        focus  : PropTypes.object,
+        onChange : PropTypes.func,
     }
 
     onChange( value, model, state, child ) {//(s)=>this.onChange(s, "option", "menu", "read" )

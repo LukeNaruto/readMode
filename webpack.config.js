@@ -7,6 +7,7 @@ const webpack = require( 'webpack' ),
         React    : 'react',
         ReactDOM : 'react-dom',
         Notify   : 'notify',
+        PropTypes: 'prop-types',
       }),
 
       // chunk files
@@ -56,6 +57,7 @@ const webpack = require( 'webpack' ),
             { from   : 'src/options/sitemgr.html',        to : '../options/' },
             { from   : 'src/options/notice.html',         to : '../options/' },
             { from   : 'src/options/corb.html',           to : '../options/' },
+            { from   : 'src/vender/jquery-2.1.1.min.js',  to : '../vender/' },
             { context: 'src/assets/images/', from : "*" , to : '../assets/images' },
             { context: 'src/assets/font/', from : "*" ,   to : '../assets/font' },
             { context: 'src/assets/css/', from : "*" ,    to : '../assets/css' },
@@ -108,9 +110,9 @@ const webpack = require( 'webpack' ),
         vendors : [
 
           // react
-          './node_modules/react/dist/react.min.js',
-          './node_modules/react-dom/dist/react-dom.min.js',
-
+          // `./node_modules/react-dom/cjs/react-dom.${isProduction() ? 'production' : 'development'}.js`,
+          // `./node_modules/react/cjs/react.${isProduction() ? 'production' : 'development'}.js`,
+          
           // vendors
           //'minimatch',
           //'to-markdown',
@@ -279,7 +281,7 @@ const webpack = require( 'webpack' ),
           special    : __dirname + '/src/read/special.jsx',
           readctlbar : __dirname + '/src/read/controlbar.jsx',
           schedule   : __dirname + '/src/read/progressbar.jsx',
-          font_css       : __dirname + '/src/assets/font/iconfont.css',
+          font_css   : __dirname + '/src/assets/font/iconfont.css',
           keyboard   : __dirname + '/src/module/keyboard.js',
           setting    : __dirname + '/src/module/setting.jsx',
           focusopt   : __dirname + '/src/module/focus.jsx',

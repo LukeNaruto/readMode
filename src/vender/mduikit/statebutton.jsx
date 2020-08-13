@@ -250,11 +250,11 @@ class SVG extends React.Component {
     }
 
     static propTypes = {
-        state        : React.PropTypes.string,
-        loadingColor : React.PropTypes.string,
-        successColor : React.PropTypes.string,
-        failedColor  : React.PropTypes.string,
-        warningColor : React.PropTypes.string,
+        state        : PropTypes.string,
+        loadingColor : PropTypes.string,
+        successColor : PropTypes.string,
+        failedColor  : PropTypes.string,
+        warningColor : PropTypes.string,
     }
 
     componentWillMount() {
@@ -340,32 +340,32 @@ export default class StateButton extends React.Component {
     }
 
     static propTypes = {
-        text    : React.PropTypes.string,
-        disable : React.PropTypes.bool,
-        icon    : React.PropTypes.string,
-        fontIcon: React.PropTypes.string,
-        order   : React.PropTypes.oneOf([ "before", "after" ]),
-        type    : React.PropTypes.oneOf([ "flat", "raised" ]),
-        mode    : React.PropTypes.oneOf([ "primary", "secondary" ]),
-        style   : React.PropTypes.object,
-        width   : React.PropTypes.string,
+        text    : PropTypes.string,
+        disable : PropTypes.bool,
+        icon    : PropTypes.string,
+        fontIcon: PropTypes.string,
+        order   : PropTypes.oneOf([ "before", "after" ]),
+        type    : PropTypes.oneOf([ "flat", "raised" ]),
+        mode    : PropTypes.oneOf([ "primary", "secondary" ]),
+        style   : PropTypes.object,
+        width   : PropTypes.string,
 
-        color           : React.PropTypes.string,
-        hoverColor      : React.PropTypes.string,
-        backgroundColor : React.PropTypes.string,
+        color           : PropTypes.string,
+        hoverColor      : PropTypes.string,
+        backgroundColor : PropTypes.string,
 
-        loadingColor    : React.PropTypes.string,
-        successColor    : React.PropTypes.string,
-        failedColor     : React.PropTypes.string,
-        warningColor    : React.PropTypes.string,
+        loadingColor    : PropTypes.string,
+        successColor    : PropTypes.string,
+        failedColor     : PropTypes.string,
+        warningColor    : PropTypes.string,
 
-        successBgColor  : React.PropTypes.string,
-        failedBgColor   : React.PropTypes.string,
-        warningBgColor  : React.PropTypes.string,
+        successBgColor  : PropTypes.string,
+        failedBgColor   : PropTypes.string,
+        warningBgColor  : PropTypes.string,
 
-        tooltip : React.PropTypes.object,
-        waves   : React.PropTypes.string,
-        onState : React.PropTypes.func,
+        tooltip : PropTypes.object,
+        waves   : PropTypes.string,
+        onState : PropTypes.func,
     }
 
     state = {

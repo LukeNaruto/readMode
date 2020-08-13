@@ -23,10 +23,10 @@ export class URLScheme extends React.Component {
     }
 
     static propType = {
-        type     : React.PropTypes.string,
-        url      : React.PropTypes.string,
-        off      : React.PropTypes.bool,
-        onChange : React.PropTypes.func,
+        type     : PropTypes.string,
+        url      : PropTypes.string,
+        off      : PropTypes.bool,
+        onChange : PropTypes.func,
     }
 
     state = {

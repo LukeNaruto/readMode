@@ -11,7 +11,7 @@ export default class URL extends React.Component {
     }
 
     static propType = {
-        flag : React.PropTypes.object,
+        flag : PropTypes.object,
     }
 
     state = {

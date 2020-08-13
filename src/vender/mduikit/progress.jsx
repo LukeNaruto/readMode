@@ -35,11 +35,11 @@ export default class Progress extends React.Component {
     }
 
     static propTypes = {
-        type     : React.PropTypes.oneOf([ "line", "circle", "semicircle", "custom" ]),
-        options  : React.PropTypes.object,
-        progress : React.PropTypes.number,
-        text     : React.PropTypes.string,
-        onChanged: React.PropTypes.func,
+        type     : PropTypes.oneOf([ "line", "circle", "semicircle", "custom" ]),
+        options  : PropTypes.object,
+        progress : PropTypes.number,
+        text     : PropTypes.string,
+        onChanged: PropTypes.func,
     }
 
     componentDidMount() {

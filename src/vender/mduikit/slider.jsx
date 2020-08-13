@@ -276,23 +276,23 @@ export default class Slider extends React.Component {
     };
 
     static propTypes = {
-        min         : React.PropTypes.number,
-        max         : React.PropTypes.number,
-        step        : React.PropTypes.number,
-        value       : React.PropTypes.number,
+        min         : PropTypes.number,
+        max         : PropTypes.number,
+        step        : PropTypes.number,
+        value       : PropTypes.number,
 
-        width       : React.PropTypes.string,
+        width       : PropTypes.string,
 
-        precentColor: React.PropTypes.string,
-        thumbColor  : React.PropTypes.string,
+        precentColor: PropTypes.string,
+        thumbColor  : PropTypes.string,
 
-        color       : React.PropTypes.string,
-        borderColor : React.PropTypes.string,
-        stateColor  : React.PropTypes.string,
-        errorColor  : React.PropTypes.string,
+        color       : PropTypes.string,
+        borderColor : PropTypes.string,
+        stateColor  : PropTypes.string,
+        errorColor  : PropTypes.string,
 
-        tooltip     : React.PropTypes.object,
-        onChange    : React.PropTypes.func,
+        tooltip     : PropTypes.object,
+        onChange    : PropTypes.func,
     }
 
     style = cssinjs()

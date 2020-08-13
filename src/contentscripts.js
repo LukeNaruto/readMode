@@ -31,6 +31,7 @@ let pr,                           // pure read object
 
 $.fn.sreffect = $.fn.velocity == undefined ? $.fn.animate : $.fn.velocity; // hack code for firefox
 
+
 /**
  * Sevice: storage Get data form chrome storage
  */
@@ -192,9 +193,11 @@ function bindShortcuts() {
     // kbd.Bind( [ storage.focus.shortcuts.toLowerCase() ], focusMode );
     kbd.Bind( [ storage.read.shortcuts.toLowerCase()  ], readMode  );
     kbd.ListenESC( combo => {
-        console.log(111,combo);
-        
         if ( combo == "esc" && storage.option.esc ) {
+            if($('#imgShowBox').children().length > 0){
+                ReactDOM.unmountComponentAtNode( $('#imgShowBox')[0] );
+                return;
+            }
             setting.Exist()  && setting.Exit();
             !setting.Exist() && focus.Exist() && focus.Exit();
             !setting.Exist() && read.Exist()  && read.Exit();
@@ -241,7 +244,15 @@ function readMode() {
     console.log( "=== simpread read mode active ===" )
     
     if(pr.state !== "adapter") return;
+    var s = document.createElement('script');
+    s.src = chrome.extension.getURL('vender/jquery-2.1.1.min.js');
+    s.onload = function() {
+        this.parentNode.removeChild(this);
+    };
+    (document.head || document.documentElement).appendChild(s);
+
     if ( !entry( read, focus, "聚焦", "阅读" )) return;
+
     console.log(1);
     
     watch.Verify( ( state, result ) => {
@@ -261,9 +272,11 @@ function readMode() {
             }
             storage.read.whitelist.unshift(hostname);
             storage.Write();
-
             getCurrent( mode.read );
+            
+            console.log(2,JSON.parse(JSON.stringify(storage)),  JSON.parse(JSON.stringify(pr)));
             if ( storage.current.site.name != "" ) {
+
                 read.Render();
             } else if ( pr.state == "temp" && pr.dom ) {
                 read.Render();

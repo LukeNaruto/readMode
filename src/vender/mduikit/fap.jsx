@@ -115,7 +115,7 @@ const cssinjs_panel = () => {
 
               position: 'absolute',
               right: '30px',
-              top: '40px',
+              top: '50px',
 
               
               width: '278px',
@@ -218,12 +218,12 @@ class Panel extends React.Component {
     };
 
     static propTypes = {
-        item       : React.PropTypes.array,
-        autoHeight : React.PropTypes.bool,
-        activeColor: React.PropTypes.string,
+        item       : PropTypes.array,
+        autoHeight : PropTypes.bool,
+        activeColor: PropTypes.string,
 
-        onOpen     : React.PropTypes.func,
-        onClose    : React.PropTypes.func,
+        onOpen     : PropTypes.func,
+        onClose    : PropTypes.func,
     };
 
     style = cssinjs_panel()
@@ -400,9 +400,6 @@ class AudioBox extends React.Component{
         clearTimeout(this.audioUnShackeTimer);
         this.audioUnShackeTimer = setTimeout(()=>{
             this.props.audioSocket(type, type === 'play' ? !this.state.playA : undefined);
-            this.setState({
-                playA: type === 'play' ? !this.state.playA : true,
-            });  
         },200);
         
     }
@@ -418,12 +415,15 @@ class AudioBox extends React.Component{
             $(this.refs.lineBg).addClass('toLeft');
         }
         
-        $(this.refs.range).attr('title', val + 'X').val(val);
+        $(this.refs.range).attr('title',val + 'X').val(val);
     }
     onChange(ev){
         console.log(ev.target.value,$(this.refs.range));
-        this.lineRepaint(ev.target.value);
-        this.props.onChange && this.props.onChange( ev.target.value );
+        this.setValue(ev.target.value)
+    }
+    setValue(val){
+        this.lineRepaint(val);
+        this.props.onChange && this.props.onChange( val );
     }
     componentWillMount(){
         const {min, max, step, pointer} = this.props.options;
@@ -432,12 +432,27 @@ class AudioBox extends React.Component{
         console.log(storage.read);
     }
     componentDidMount() {
-        this.lineRepaint(this.props.value);
+        const {value,audio} = this.props;
+        this.lineRepaint(value);
+        audio.addEventListener('play',(res)=>{
+            this.setState({
+                playA: !audio.paused,
+            }); 
+        });
+        audio.addEventListener('pause',(res)=>{
+            this.setState({
+                playA: !audio.paused,
+            }); 
+        });
+        this.setState({
+            playA: !audio.paused,
+        }); 
     }
     render(){
         const {state: {playA}, props:{desc,options:{min, max, step}}, len, fence} = this;
         return (
             <div className="audio-box">
+                
                 <span onClick={()=>{$('panel-bg').click();}} className="close iconfont icon-closepx"></span>
                 <div className="play-settings">
                     <span onClick={()=>{this.playFn('pre')}} className="pre-audio"><i className="iconfont icon-voice-set-backoff-16px"></i></span>
@@ -456,49 +471,59 @@ class AudioBox extends React.Component{
                             }
                             <line-bg ref="lineBg" />
                         </line>
-
+                        {
+                            Array(len + 1).fill('').map((v,i)=>(
+                                <title-item onClick={()=>this.setValue(step * (i + 2))} title={`${step * (i + 2)}X`} style={{position: 'absolute',left: `calc( 38px * ${i})`,width: '18px', top: 0,height: '100%',cursor: 'pointer' }}></title-item>
+                            ))
+                        }
                     </play-goup>
                 </play-rate>
             </div>
         )
     }
 }
+class ProgressBar extends React.Component{
+    onChange(ev){
+        console.log('onChange--',ev.target.value);
+        this.setValue(ev.target.value)
+        this.props.audioSocket('play',  false);
+    }
+    onMouseUp(ev){
+        this.props.onTimeChange && this.props.onTimeChange( ev.target.value );
+        this.props.audioSocket('play', true);
+    }
+    setValue(val){
+        console.log('setValue--1',val);
+        val = +(+val).toFixed(2);
+        if(isNaN(val)) return;
+        const width = val + '%';
+        console.log('setValue--2',val,width);
+        $('.audio-progressBar').css({width});
+        $(this.refs.progress_range).attr('title',val + '%').val(val);
+    }
+    
+    componentWillMount(){
+        
+    }
+    componentDidMount() {
+        const {audio } = this.props;
+        audio && audio.addEventListener('timeupdate',()=>{
+            
+            const width = audio.currentTime / audio.duration * 100;
+            console.log('timeupdate--1',width,audio.currentTime,audio.duration  );
+            if(!isNaN(width))this.setValue(width);
+        })
+    }
+    render(){
+        return(
+            <div className="audio-progressBar-box">
+                <input ref="progress_range" onMouseUp={ evt=>this.onMouseUp(evt)} onChange={ evt=> this.onChange(evt) } type="range" min="0" max="100" step=".1" />
+                <div className="audio-progressBar"></div>
+            </div>
+        );
+    }
+}
 
-/**
- * Custom component: Floating Action Panel, component e.g.
- * 
-    <Button id={ "exit" } name={"退出"} icon={ {style.spec_icon, `${path}assets/images/exit_icon.png`} } type={ "spec" }   style={ style.spec } />
-    <Button id={ "more" } name={"更多"} icon={ {style.icon, `${path}assets/images/more_icon.png` } }     type={ "anchor" } style={ style.origin } />
-    <panel-bg>
-        <panel>
-            <panel-tabs>
-                <panel-tab active="true">
-                    <span>设定</span>
-                    <panel-border></panel-border>
-                </panel-tab>
-                <panel-tab>
-                    <span>动作</span>
-                    <panel-border></panel-border>
-                </panel-tab>
-                <panel-tab>
-                    <span>脚本</span>
-                    <panel-border></panel-border>
-                </panel-tab>
-        </panel-tabs>
-            <panel-groups>
-                <panel-group>设定</panel-group>
-                <panel-group>动作</panel-group>
-                <panel-group>脚本</panel-group>
-            </panel-groups>
-        </panel>
-    </panel-bg>
- * 
- * Reference:
- * - https://material.io/guidelines/components/tabs.html
- * - https://bulma.io/documentation/components/tabs/
- * 
- * @class
- */
 export default class Fap extends React.Component {
 
     static defaultProps = {
@@ -508,49 +533,27 @@ export default class Fap extends React.Component {
         autoHide    : true,
         tabAutoSel  : true,
 
-        triggerItems: {
-            "exit"  : {
-                "name": "关闭",
-                "icon": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAdklEQVQ4y+WTuQ3AIBAEaQKK8NN/BEUArmccgGyj43MMIZo5TqtFqbUPJxYtbg2OvS44IJQKhguwdUETSiXjXr77KhGICRjihWKm8Dw3KXP4Z5VZ/Lfw7B5kyD1cy5C7uAx5iJcht6vhRTUi4OrC0Szftvi/vAFNdbZ2Dp661QAAAABJRU5ErkJggg==",
-            },
-            "anchor": {
-                "name" : "更多",
-                "icon" : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAANElEQVQ4T+3GMQ0AIAwAMAwSEvwLACai3HtmAHq1te8xpnCM6okAu3rigFU9MWxLr/695AI0E1VgH26hCQAAAABJRU5ErkJggg==',
-            }
-        },
         waves       : undefined,
     };
-    audio = new Audio();
-    audioUnShackeTimer = null;
-    catchCount = 0;
-    count = 0;
-    
-    audioOptions = {
-        min: .5,
-        max: 1.75,
-        step: .25,
-        pointer: 1
-    }
     static propTypes = {
-        item        : React.PropTypes.array,   // panel props
-        autoHeight  : React.PropTypes.bool,    // panel props
-        activeColor : React.PropTypes.string,  // panel props
-        autoHide    : React.PropTypes.bool,    // panel props
-        tabAutoSel  : React.PropTypes.bool,    // panel props
+        item        : PropTypes.array,   // panel props
+        autoHeight  : PropTypes.bool,    // panel props
+        activeColor : PropTypes.string,  // panel props
+        autoHide    : PropTypes.bool,    // panel props
+        tabAutoSel  : PropTypes.bool,    // panel props
 
-        triggerItems: React.PropTypes.object,
-        waves       : React.PropTypes.string,
+        waves       : PropTypes.string,
 
-        onOpen      : React.PropTypes.func,
-        onClose     : React.PropTypes.func,
-        onAction    : React.PropTypes.func,
+        onOpen      : PropTypes.func,
+        onClose     : PropTypes.func,
+        onAction    : PropTypes.func,
     }
     constructor(){
         super();
         this.state = {
             active: '',
-            playA: false,
             count: 0,
+            timeRange: 0,
         }
     }
 
@@ -575,7 +578,7 @@ export default class Fap extends React.Component {
             click: ()=>{
                 window.print();
             }
-        },
+        },/* 
         F11:{
             title: '全屏',
             icon: 'F11',
@@ -583,7 +586,7 @@ export default class Fap extends React.Component {
             click: ()=>{
                 document.documentElement.requestFullscreen();
             }
-        },
+        }, */
         setting:{
             title: '阅读模式样式设置',
             icon: 'setting',
@@ -644,6 +647,10 @@ export default class Fap extends React.Component {
         if ( event.target.tagName.toLowerCase() == "panel-bg" ) {
             const $panelbg = $( this.refs.bg ),
                   style    = { ...this.style };
+            if(!this.playA){
+                $('.readDOM').removeClass('audioReaded');
+                $('.audio-progressBar-box').removeClass('active');
+            }
             ReactDOM.unmountComponentAtNode( $panelbg[0] );
             $panelbg.css({ ...style.panel_bg });
             $(this.refs[this.state.active]).removeClass('active');
@@ -655,71 +662,97 @@ export default class Fap extends React.Component {
             });
         }
     }
+    audio = new Audio();
+    audioUnShackeTimer = null;
+    catchCount = 0;
+    count = 0;
+    playA = false;
+    playing = false;
     audioGetText(count){
-        const {audio, catchCount} = this;
-        const text = $('sr-rd-content > *')[count] ? $('sr-rd-content > *')[count].innerText.trim() : '';
+        this.playing = true;
+        const {audio, catchCount, playA} = this;
+        const dom = $('.readDOM')[count];
+        const text = dom ? dom.innerText.trim() : '';
         if(text){
             const url = "//tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + encodeURI(text);
             audio.src = url;
             audio.playbackRate = storage.read.playbackRate;
-            this.setState((preState)=>({
-                ...preState,
-                playA: false,
-            }));
+            this.playA = false;
         }else{
             const type = catchCount > count ? 'pre' : 'next';
-            this.audioSwitch(type);
+            $(dom).removeClass('readDOM');
+            this.audioSwitch(type, true);
         }
     }
-    runAudio(revise){
-        this.setState((preState)=>({
-            ...preState,
-            playA: revise === undefined ? !preState.playA : revise,
-        }),async ()=>{
-            const {audio,count,catchCount, state:{playA}} = this;
+    async runAudio(revise){
+
+        this.playA = revise === undefined ? !this.playA : revise;
+
+        const {audio,count,catchCount, playA} = this;
+        console.log(2, playA, count);
+        if(playA){
+            const distance = $('html').height() * .5;
+            const dom = $('.readDOM').get(count);
+            if(!dom) return;
+            const offsetTop = dom.offsetTop + dom.clientHeight * .5;
+            $('.simpread-read-root').scrollTop(offsetTop - distance);
             
-            console.log(2, playA, this.state.playA);
-            if(playA){
-                const distance = $('html').height() * .5;
-                const offsetTop = $('sr-rd-content > *').get(count).offsetTop + $('sr-rd-content > *').get(count).clientHeight * .5;
-                $('.simpread-read-root').scrollTop(offsetTop - distance);
-                await setTimeout(()=>{
-                    $('sr-rd-content > *').eq(count).addClass('audioReading');
-                    audio.play().catch(err=>{
-                        const type = catchCount > count ? 'pre' : 'next';
-                        console.log(321,audio.readyState, err)
-                        this.audioSwitch(type);
-                    })
-                    this.catchCount = count;
-                },200);
-            }else{
-                $('sr-rd-content > *').eq(count).removeClass('audioReading');
-                audio.pause();
-            };
-        });
+            await setTimeout(()=>{
+                
+                
+                audio.play().then(()=>{
+                    console.log(audio.duration, audio.currentTime,count ,this.count);
+                    
+                    $('.readDOM').eq(count).addClass('audioReading ');
+                    $('.readDOM').removeClass('audioReaded');
+                    $('.audio-progressBar-box').addClass('active');
+                    for(let i=0;$('.readDOM').length > i;i++){
+                        $('.readDOM').eq(i).addClass('audioReaded');
+                        if(i >= count) break;
+                    }
+                }).catch(err=>{
+                    const type = catchCount > count ? 'pre' : 'next';
+                    console.log(321,audio.readyState, err)
+                    this.audioSwitch(type);
+                })
+                this.catchCount = count;
+            },200);
+        }else{
+            $('.readDOM').removeClass('audioReading');
+            audio.pause();
+        };
     }
-    audioSwitch(type){
-        const max = $('sr-rd-content > *').length;
+    audioSwitch(type, revise){
+        console.log('audioSwitch---',type);
+        
+        const max = $('.readDOM').length;
         let {count, audio} = this;
-        $('sr-rd-content > *').eq(count).removeClass('audioReading');
-        audio.pause();
         // this.catchCount = count;
         if(type === 'pre'){
             count = --count >=0 ? count : 0;
-        }else if(type === 'next'){
-            if(++count >= max) count = max - 1;
+        }else if(type === 'next' && !revise){
+            if(++count >= max) count = max;
             console.log(audio.readyState, audio.duration,audio.networkState);
             console.log('audioSwitch--next', count, max);
         }
+        
+        
+        $('.readDOM').removeClass('audioReading');
+        audio.pause();
+        
         this.count = count;
+        this.playing = false;
+        
+        if(count === max) return;
         this.audioGetText(this.count);
-        this.runAudio();
+        this.runAudio(revise);
     }
     audioSocket(type, revise){
         console.log('revise--',revise);
         
         switch(type){
             case 'play':
+                if(!this.playing)this.audioGetText(this.count);
                 this.runAudio(revise);
                 break;
             default:
@@ -735,15 +768,22 @@ export default class Fap extends React.Component {
         audio.playbackRate = val;
         
     }
+    audioOptions = {
+        min: .5,
+        max: 1.75,
+        step: .25,
+        pointer: 1
+    };
     audioRender(){
         const $panelbg = $( this.refs.bg );
         const {audio} = this;
         if ( $panelbg.length > 0 ) {
+            audio.playbackRate = storage.read.playbackRate;
             const style = { ...this.style };
             $(this.refs[this.state.active]).addClass('active');
             $panelbg.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
             ReactDOM.render( 
-                <AudioBox value={audio.playbackRate} desc="倍速" options={this.audioOptions} playA={this.state.playA} onChange={(v)=>this.changeAudioRate(v)} audioSocket={(type, revise) => this.audioSocket(type,revise)} />, $panelbg[0] );
+                <AudioBox audio={audio} value={audio.playbackRate} desc="倍速" options={this.audioOptions} playA={this.playA} onChange={(v)=>this.changeAudioRate(v)} audioSocket={(type, revise) => this.audioSocket(type,revise)} />, $panelbg[0] );
         }
     }
     panelRender() {
@@ -761,44 +801,39 @@ export default class Fap extends React.Component {
     onPop( type ) {
         this.props[type] && this.props[type]();
     }
+    onTimeChange(val){
+        const {audio} = this;
+        const newTime = audio.duration * val / 100;
+        console.log('onTimeChange----',audio.duration, val,newTime);
+        
+        audio.currentTime = newTime;
+    }
     componentDidMount(){
         const {audio} = this;
-        this.audioGetText(0);
         audio.onended = () => {
             const {count} = this;
-            const max = $('sr-rd-content > *').length;
+            const max = $('.readDOM').length;
             if(max >= count + 2 )this.audioSwitch('next');
+            this.playing = false;
             console.log('ending');
         }
+        // audio.addEventListener('timeupdate',()=>{
+        //     const width = audio.currentTime / audio.duration * 100;
+        //     this.setState(preState => ({
+        //         ...preState,
+        //         timeRange: width
+        //     }))
+        //     console.log(123,audio.duration, audio.currentTime)
+        // });
     }
     render() {
-        const style = { ...this.style };
-        style.spec  = { ...style.origin, ...style.large, ...style.spec_item };
-
         const evt   = this.props.autoHide ? {
             onMouseOver: (e)=> this.panelBgEventHandler(e)
         } : {
             onClick    : (e)=> this.panelBgEventHandler(e)
         };
 
-        const btn_props = ( id, type, style, { name, color, icon }, icon_style, tooltip, waves )=> {
-                return {
-                    id,
-                    type,
-                    style,
-                    name,
-                    color,
-                    tooltip,
-                    waves,
-                    icon       : { style: icon_style, path: icon },
-                    onClick    : evt=>this.btnClickHandler(evt),
-                    onMouseOver: evt=>this.btnMouseOverHandler(evt),
-                    onMouseOut : evt=>this.btnMouseOutHandler(evt),
-                };
-        },
-        spec   = <Button { ...btn_props( "exit", "spec",     style.spec,   this.props.triggerItems.exit,   style.icon, {target: "name", delay: 50}, this.props.waves ) } />,
-        anchor = <Button { ...btn_props( "anchor", "anchor", style.origin, this.props.triggerItems.anchor, style.icon, {target: "name", delay: 50}, this.props.waves ) } />,
-        panelBg  = <panel-bg ref="bg"></panel-bg>;
+        const panelBg  = <panel-bg ref="bg"></panel-bg>;
         const tools = Object.values(this._btn_group).map(item => {
             const imgURL = chrome.extension.getURL(`assets/images/icons/${item.icon}.png`);
             return (
@@ -816,9 +851,8 @@ export default class Fap extends React.Component {
         };
         return (
             <fap style={rootStyle} { ...evt } >
+                <ProgressBar audio={this.audio} audioSocket={(type, revise) => this.audioSocket(type,revise)} onTimeChange={this.onTimeChange} />
                 {tools}
-                {/* { spec   }
-                { anchor } */}
                 {panelBg}
             </fap>
         )

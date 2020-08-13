@@ -32,51 +32,186 @@ const rdcls   = "simpread-read-root",
 // load count,.0: call Readability. 1: call highlight 2: all failed
 let   load_count = 0;
 
-const Footer = () => {
-    const good_icon = '<svg t="1556354786433" viewBox="0 0 1024 1024" version="1.1" width="33" height="33"><defs><style type="text/css"></style></defs><path d="M859.8 191.2c-80.8-84.2-212-84.2-292.8 0L512 248.2l-55-57.2c-81-84.2-212-84.2-292.8 0-91 94.6-91 248.2 0 342.8L512 896l347.8-362C950.8 439.4 950.8 285.8 859.8 191.2z" p-id="6225" fill="#8C8C8C"></path></svg>',
-          bad_icon  = '<svg t="1556354650943" viewBox="0 0 1024 1024" version="1.1" p-id="5899" width="33" height="33"><defs><style type="text/css"></style></defs><path d="M458 576c2-36 0-76 16-110 4-10 2-20 2-30-8-42-28-80-30-120 0-2.78 2.008-9.542 2.01-12.314-6.432 4.468-15.214 8.048-22.01 10.314-40 12-35.02 5.146-69.02 27.146l-23.866 14.456c32.686-35.878 77.056-49.562 113.05-77.428 0.388-30.876 1.716-61.354 6.274-91.68C371.22 106.992 243.57 108.536 164.246 191.14c-90.994 94.688-90.994 248.202 0 342.89l305.698 318.192c-0.17-21.312-0.886-42.352-3.944-62.222C454 718 458 648 458 576z" p-id="5900" fill="#8C8C8C"></path><path d="M644 602c-22-52-66-88-126-100-1.7 0-3.758-1.086-5.872-2.638-0.046 0.214-0.082 0.426-0.128 0.638-22 96-46 188-42 284 0 24.454 7.966 50.234 7.666 76.262L512 896l208-216.5C690.306 658.542 660.856 637.242 644 602z" p-id="5901" fill="#8C8C8C"></path><path d="M859.748 191.14c-80.852-84.188-211.978-84.188-292.816 0L528 230.806c0.15 26.35 0.426 52.404-6 77.194-4 20-38 38-32 62 6.006 26.426 16.332 51.41 21.464 77.118C542.028 464.168 569.542 485.792 594 512c45.602 53.532 75.494 114.918 130.566 162.742l135.182-140.71C950.75 439.342 950.75 285.828 859.748 191.14z" p-id="5902" fill="#8C8C8C"></path></svg>',
-          onClick   = ( rate = false ) => {
-            fb.Render( storage.version, storage.user, rate );
-                setTimeout( () => tooltip.Render( ".simpread-feedback" ), 200 );
-            };
-    return (
-        <sr-rd-footer>
-            <sr-rd-footer-group>
-                <sr-rd-footer-line></sr-rd-footer-line>
-                <sr-rd-footer-text>全文完</sr-rd-footer-text>
-                <sr-rd-footer-line></sr-rd-footer-line>
-            </sr-rd-footer-group>
-            {/* <sr-rd-footer-copywrite>
-                <div>本文由 <a href="http://ksria.com/simpread" target="_blank">简悦 SimpRead</a> 优化，用以提升阅读体验</div>
-                <div className="second">使用了 <abbr>全新的简悦词法分析引擎<sup>beta</sup></abbr>，<a target="_blank" href="http://ksria.com/simpread/docs/#/词法分析引擎">点击查看</a>详细说明</div>
-                <div className="third">
-                    <a className="sr-icon good sr-top" aria-label="觉得不错？请帮忙投票 😄" data-balloon-pos="up" target="_blank" onClick={ ()=>onClick( true ) } dangerouslySetInnerHTML={{__html: good_icon }} ></a>
-                    <a className="sr-icon bad sr-top"  aria-label="有待改进，请帮忙吐槽 😄" data-balloon-pos="up" target="_blank" onClick={ ()=>onClick() } dangerouslySetInnerHTML={{__html: bad_icon  }} ></a>
-                </div>
-            </sr-rd-footer-copywrite> */}
-        </sr-rd-footer>
-    )
+class SrRead extends React.Component{
+    constructor(props){
+        super();
+    }
+    componentDidMount(){
+        const {wrapper} = this.props;
+        setTimeout(()=>{
+            $('sr-rd-content > *').addClass('readDOM');
+        });
+    }
+    render(){
+        const {wrapper} = this.props;
+        //dangerouslySetInnerHTML={{__html: wrapper.include }} 无法渲染/<!--.*?-->/g,pureread正则有问题
+        // wrapper.include = wrapper.include.replace(/<!--.*?-->/g, '');
+        
+        const Article = <sr-rd-content dangerouslySetInnerHTML={{__html: wrapper.include }}></sr-rd-content>;
+        return(
+            <sr-read >
+                <sr-rd-title class="readDOM">{ wrapper.title }</sr-rd-title>
+                <sr-rd-hostname  class="readDOM">{location.hostname}</sr-rd-hostname>
+                { Article }
+                
+            </sr-read>
+        )
+    } 
 }
-const SrRead = (props) => {
-    const {wrapper} = props;
-    const Page    = wrapper.paging && wrapper.paging.length > 0 && 
-        <spec.Paging paging={ wrapper.paging } />;
-    const Article = wrapper.avatar && wrapper.avatar.length > 0 ? 
-        <spec.Multiple include={ wrapper.include } avatar={ wrapper.avatar } /> :
-        <sr-rd-content dangerouslySetInnerHTML={{__html: wrapper.include }} ></sr-rd-content>;
+class ImgShowBox extends React.Component {
+    imgWidth = 0;
+    imgHeight = 0;
+    constructor(props){
+        super();
+        const {srcImgs, idx} = props;
+        this.state = {
+            src: srcImgs[idx],
+            idx,
+            percent: 100,
+            x: 0,
+            y: 0
+        }
+        console.log(this.props,props);
+        
+        this.len = props.srcImgs.length;
+    }
+    close(){
+        ReactDOM.unmountComponentAtNode( $('#imgShowBox')[0] );
+    }
+    switchImg(dir){
+        const {srcImgs} = this.props;
+        this.imgWidth = this.imgHeight = 0;
+        this.setState((preState) => {
+            let idx = preState.idx + (dir ? 1 : -1);
+            idx = idx >= this.len ? 0 : idx;
+            idx = idx < 0 ? this.len - 1 : idx;
+            return {
+                ...preState,
+                idx,
+                src: srcImgs[idx],
+                x: 0,
+                y: 0,
+                percent: 100,
+            }
+        });
+    }
+    download(status){
+        const {state: { src }, props: { srcImgs }} = this;
+        browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.image_download, 
+            { status, src, uri: window.location.href}), 
+            function (res) {
 
-    return (
-        <sr-read>
-            {/* <ProgressBar show={ read.progress } /> */}
-            <sr-rd-title>{ wrapper.title }</sr-rd-title>
-            {/* <sr-rd-desc>{ wrapper.desc }</sr-rd-desc> */}
-            <sr-rd-hostname>{location.hostname}</sr-rd-hostname>
-            { Article }
-            {/* { Page    } */}
-            {/* <Footer /> */}
-            
-        </sr-read>
-    )
+            }
+        )
+    }
+    zoomImg = (ratioDelta) => {
+        let percent = Number((this.state.percent * ratioDelta).toFixed(0));
+        if (percent <= 5) {
+            percent = Number((5 * ratioDelta).toFixed(0));
+        }
+        if (percent > 95 && percent < 105) {
+            percent = 100;
+        } else if (percent >= 1000) {
+            percent = 1000;
+        } else if (percent < 5) {
+            percent = 5;
+        }
+        this.setState((preState)=>{
+            return {
+                ...preState,
+                percent
+            }
+        });
+    }
+    scaleImg(e){
+        let _delta = e.originalEvent.wheelDelta;
+        this.zoomImg(_delta > 0 ? 1.1 : .9)
+        console.log(this.scale, e.originalEvent.wheelDelta, this.refs.curImg)
+    }
+    componentDidMount(){
+        const _this = this;
+        $('#imgShowBox').on('mousewheel', this.scaleImg.bind(this));
+        $(this.refs.curImg).on('mousedown', function(d_e){
+            const {x: curX, y: curY, percent} = _this.state;
+            const paintW = this.width  * percent / 100, 
+                  paintH = this.height * percent / 100;
+
+            const maxX = (document.documentElement.clientWidth  + paintW) / 2,
+                  maxY = (document.documentElement.clientHeight + paintH) / 2;
+            $('.img-show-box').on('mousemove', function(m_e){
+                let x = curX + m_e.pageX - d_e.pageX, 
+                    y = curY + m_e.pageY - d_e.pageY;
+                if(x > 0){
+                    x = maxX - 20 < x ? maxX - 20 : x;
+                }else{
+                    x = -(maxX - 20) > x ? -(maxX - 20) : x;
+                }
+                if(y > 0){
+                    y = maxY - 20 < y ? maxY - 20 : y;
+                }else{
+                    y = -(maxY - 20) > y ? -(maxY - 20) : y;
+                }
+                _this.refs.curImg.style.cursor = 'pointer';
+                _this.setState((preState)=>{
+                    return {
+                        ...preState,
+                        x: x,
+                        y: y,
+                    }
+                });
+            });
+            $('.img-show-box').on('mouseup mouseout',function (e){
+                _this.refs.curImg.style.cursor = 'default';
+                $(this).unbind('mouseup mouseout mousemove');
+            });
+        });
+        this.refs.closeEl.addEventListener('click',(e)=>{
+            if($(e.target).hasClass('show-box') || $(e.target).hasClass('img-show-box')){
+                this.close();
+            }
+        });
+        
+    }
+    componentWillUnmount(){
+        $('#imgShowBox').unbind('mousewheel', this.scaleImg.bind(this));
+        $(this.refs.curImg).unbind();
+    }
+    render(){
+        // todo
+        const {state:{src,idx, percent,x,y},len} = this;
+        const Btns = (<div>
+                    <div onClick={()=>this.close()} className="btn-close btn-circle"><i className="iconfont icon-yuedumoshi_guanbi"></i></div>
+                        <div onClick={()=>this.switchImg(0)} className={`btn-pre btn-circle ${len <= 1 && 'disable'}`}>
+                            <i className="iconfont icon-yuedumoshi_youxuanzhuan"></i>
+                        </div>
+                        <div onClick={()=>this.switchImg(1)} className={`btn-next btn-circle ${len <= 1 && 'disable'}`}>
+                            <i className="iconfont icon-yuedumoshi_zuoxuanzhuan"></i>
+                        </div>
+                </div>);
+        const btnGroups = <ul className="btn-groups">
+            <li onClick={()=>this.download(0)}><i className="iconfont icon-yuedumoshi_dantuxiazai"></i></li>
+            <li onClick={()=>this.download(1)}><i className="iconfont icon-yuedumoshi_duotuxiazai"></i></li>
+            <li><a href="https://bbs.minibai.com/" title="反馈" target="_blank"><i className="iconfont icon-yuedumoshi_fankui"></i></a> </li>
+            <li>{`${ idx + 1 }  |  ${len}`}</li>
+        </ul>;
+        const Img = (
+            <img ref="curImg" draggable="false" src={src} alt="image" style={{transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />);
+        if(!this.imgWidth && !this.imgHeight){
+            const images = new Image();
+            images.src = src;
+            this.imgWidth = images.width;
+            this.imgHeight = images.height;
+        } 
+        return (
+            <div ref="closeEl" className="img-show-box">
+                <p className="sub-des">图片大小：{this.imgWidth} <i className="iconfont icon-yuedumoshi_guanbi"></i>  {this.imgHeight}</p>
+                <div className="show-box">{Img}</div>
+                {Btns}
+                {btnGroups}
+                
+            </div>
+        )
+    }
 }
 
 class Read extends React.Component {
@@ -90,47 +225,7 @@ class Read extends React.Component {
         }
     }
     verifyContent() {
-        console.log(98765);
-        
-        if ( $("sr-rd-content").text().length < 100 ) {
-            if ( load_count == 0 ) {
-                new Notify().Render({ content: "检测到正文获取异常，是否重新获取？", action: "是的", cancel: "取消", callback: type => {
-                    if ( type == "cancel" ) return;
-                    load_count++;
-                    this.componentWillUnmount();
-                    storage.pr.Readability();
-                    Render();
-                }});
-            } else if ( load_count == 1 ) {
-                this.componentWillUnmount();
-                new Notify().Render({ content: '获取正文失败，是否使用 <a target="_blank" href="http://ksria.com/simpread/docs/#/手动框选">手动框选</a> 高亮的方式获取？', action: "是的", cancel: "取消", callback: type => {
-                    if ( type == "cancel" ) return;
-                    setTimeout( () => {
-                        Highlight().done( dom => {
-                            const rerender = element => {
-                                load_count++;
-                                storage.pr.TempMode( "read", element );
-                                Render();
-                            };
-                            storage.current.highlight ? 
-                                highlight.Control( dom ).done( newDom => {
-                                    rerender( newDom );
-                                }) : rerender( dom );
-                        });
-                    }, 200 );
-                }});
-            } else if ( load_count >= 2 ) {
-                this.componentWillUnmount();
-                new Notify().Render({ content: "高亮无法仍无法适配此页面，是否提交？", action: "是的", cancel: "取消", callback: type => {
-                    if ( type == "cancel" ) return;
-                    browser.runtime.sendMessage( msg.Add( msg.MESSAGE_ACTION.save_site, { url: location.href, site: {}, uid: storage.user.uid, type: "failed" }));
-                }});
-                load_count = 0;
-            }
-            return false;
-        } else {
-            return true;
-        }
+        return true;
     }
 
     componentWillMount() {
@@ -145,39 +240,52 @@ class Read extends React.Component {
     }
 
     async componentDidMount() {
-        if ( load_count > 0 && !this.verifyContent() ) {
-            return;
-        }
+        // if ( load_count > 0 && !this.verifyContent() ) {
+        //     return;
+        // }
     
         let scrollCount = 0;
         let unshakeTimer = null;
         
-        const this_ = this;
-        this_.renderPreload(this_);
+        this.renderPreload(this);
         $root
             .addClass( "simpread-font" )
             .addClass( theme )
-            .find( rdclsjq )
+            .on('contextmenu',function(){return false;})
+            .find( '.simpread-scroll' )
                 .addClass( theme )
                 .sreffect( { opacity: 1 }, { delay: 100 })
                 .addClass( "simpread-read-root-show" )
-                .on('contextmenu',function(){return false;})
-                .on('scroll',function(){
-                    const scrollTemp = $(this).scrollTop();
+                .on('scroll',()=>{
                     clearTimeout(unshakeTimer);
+                    ss.ToTopRight();
+                    const scrollTemp = $('.simpread-scroll').scrollTop();
                     unshakeTimer = setTimeout(()=>{
                         const top = scrollTemp > scrollCount ? '-54px' : '0';
                         $('sr-rd-crlbar').css({'marginTop': top});
-                        $('sr-rd-crlbar').removeClass('scrolling');
-                        if(scrollTemp) $('sr-rd-crlbar').addClass('scrolling');
+                        if(scrollTemp) {
+                            $('sr-rd-crlbar').addClass('scrolling')
+                            $(this.refs.toTop).show();
+                        }else{
+                            $('sr-rd-crlbar').removeClass('scrolling');
+                            $(this.refs.toTop).hide();
+                        };
                         scrollCount = scrollTemp;
                     },100);
-                    //todo
-                    this_.renderPreload(this_)
+                    
+                    this.renderPreload(this)
                 })
                 .on('click', function(){
                     $('sr-rd-crlbar').css({'marginTop': 0});
                 });
+        window.addEventListener('resize',()=>{
+            ss.ToTopRight();
+        });
+        $(this.refs.toTop).on('click', function(){
+            $('.simpread-scroll').animate({
+                scrollTop: 0,
+            },500)
+        });
 
         this.props.read.fontfamily && ss.FontFamily( this.props.read.fontfamily );
         this.props.read.fontsize   && ss.FontSize( this.props.read.fontsize );
@@ -190,6 +298,8 @@ class Read extends React.Component {
         $( "sr-rd-desc" ).text().trim() == "" && $( "sr-rd-desc" ).addClass( "simpread-hidden" );
 
         excludes( $("sr-rd-content"), this.props.wrapper.exclude );
+        console.log('------beauti--',$( "sr-rd-content" ).find('video'));
+        
         storage.pr.Beautify( $( "sr-rd-content" ) );
         storage.pr.Format( rdcls );
 
@@ -210,29 +320,43 @@ class Read extends React.Component {
             tips.Render( storage.option.plugins );
             tips.Help( storage.statistics );
         }, 50 );
+        // todo
+        $('#read_container_ img').on('click', function(){
+            const idx = $('#read_container_ img').index($(this));
+            let $imgShowBox = $('#imgShowBox');
+            if(!$imgShowBox.length) {
+                $imgShowBox = $('<div id="imgShowBox"></div>');
+                $('.simpread-read-root').append($imgShowBox);
+            }
+            const srcImgs = []
+            $('#read_container_ img').each((i, img)=> {
+                srcImgs.push($(img).attr('src'))
+            })
+            ReactDOM.render(<ImgShowBox idx={idx} srcImgs={srcImgs} />, $imgShowBox[0]); 
+        })
     }
 
-    async renderPreload(this_) {
+    async renderPreload() {
         let {locked, nextUrl} = this.state;
         const preload = storage.read.preload;
         const paging = this.props.wrapper.paging;
         // console.log(preload,locked, !locked && paging && paging.length > 0 && preload, paging);
-
+        
         if (!locked && paging && paging.length > 0 && preload) {
             const clientH = $('#read_container_').height() + 40;
-            const scrollT = $(rdclsjq).scrollTop() + $(".simpread-read-root").height() * 2;
+            const scrollT = $('.simpread-scroll').scrollTop() + $(".simpread-read-root").height() * 2;
             const pageLittle = $('#read_container_').height() < $(".simpread-read-root").height();
-            // console.log(storage);
+            // console.log(scrollT > clientH , pageLittle);
             if (scrollT > clientH || pageLittle) {
-                await this_.setState((pre) => ({
+                await this.setState((pre) => ({
                     ...pre,
                     locked: true,
                 }));
-                browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.notify_preload, { url: nextUrl }), function (res) {
+                browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.notify_preload, { url: nextUrl }), (res) => {
                     // console.log(res);
                     const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
-                    // console.log(nextContent,this_.state.htmls);
-                     this_.setState((pre) => ({
+                    // console.log(nextContent,this.state.htmls);
+                     this.setState((pre) => ({
                         ...pre,
                         htmls: [...pre.htmls, nextContent],
                         locked: false,
@@ -335,25 +459,28 @@ class Read extends React.Component {
     }
 
    // exit read mode
-   exit() {
+    exit() {
         Exit();
     }
     render() {
+        
         return (
-            <div id="read_container_" style={{width: '100%'}}>
-                <ReadCtlbar show={ this.props.read.controlbar } 
-                            multi={ this.props.wrapper.avatar ? true : false }
-                            type={ this.props.wrapper.name }
-                            site={{ title: this.props.wrapper.title, url: window.location.href }} 
-                            custom={ this.props.read.custom } onAction={ (t,v,c)=>this.onAction( t,v,c ) }/>
-                {/* todo2 */}
-                {
-                    this.state.htmls.map(html => (
-                        <SrRead wrapper={html} />
-                    ))
-                }
-                
+            <div className="simpread-scroll">
+                <div id="read_container_" style={{width: '100%', position: 'relative'}}>
+                    <ReadCtlbar show={ this.props.read.controlbar } 
+                                multi={ this.props.wrapper.avatar ? true : false }
+                                type={ this.props.wrapper.name }
+                                site={{ title: this.props.wrapper.title, url: window.location.href }} 
+                                custom={ this.props.read.custom } onAction={ (t,v,c)=>this.onAction( t,v,c ) }/>
+                    {
+                        this.state.htmls.map(html => (
+                            <SrRead wrapper={html} />
+                        ))
+                    }
+                    <span className="toTop" ref="toTop" id="toTop"><i className="iconfont icon-yuedumoshi_fanhuidingbu"></i></span>
+                </div>
             </div>
+            
             
         )
     }
@@ -372,10 +499,24 @@ function Render( callMathjax = true ) {
     loadPlugins( "read_start" );
     callMathjax && mathJaxMode();
     storage.pr.ReadMode();
+    console.log(JSON.parse(JSON.stringify(storage)));
     if ( typeof storage.pr.html.include == "string" && storage.pr.html.include.startsWith( "<sr-rd-content-error>" ) ) {
         console.warn( '=== Adapter failed call Readability View ===' )
         storage.pr.Readability();
         storage.pr.ReadMode();
+        
+        console.log(4,JSON.parse(JSON.stringify(storage)));
+        if(storage.pr.state.startsWith('temp')){
+            storage.pr.state = 'adapter';
+        }
+        
+        if(storage.pr.html.name.startsWith('tempread::')){
+            storage.pr.html.name = storage.pr.html.name.replace('tempread::', '');
+            storage.pr.html.target = 'global'
+        }
+        
+        console.log(4,JSON.parse(JSON.stringify(storage)));
+        
     } else console.warn( '=== Normal Read mode ===' )
     storage.pr.htmls = [storage.pr.html];
     console.log(JSON.parse(JSON.stringify(storage)));

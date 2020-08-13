@@ -228,18 +228,18 @@ export default class TextField extends React.Component {
     };
 
     static propTypes = {
-        multi       : React.PropTypes.bool,
-        rows        : React.PropTypes.number,
-        password    : React.PropTypes.bool,
-        disable     : React.PropTypes.bool,
-        value       : React.PropTypes.string,
-        override    : React.PropTypes.bool,
-        placeholder : React.PropTypes.string,
-        floatingtext: React.PropTypes.string,
-        errortext   : React.PropTypes.string,
-        tooltip     : React.PropTypes.object,
-        onChange    : React.PropTypes.func,
-        onKeyDown   : React.PropTypes.func,
+        multi       : PropTypes.bool,
+        rows        : PropTypes.number,
+        password    : PropTypes.bool,
+        disable     : PropTypes.bool,
+        value       : PropTypes.string,
+        override    : PropTypes.bool,
+        placeholder : PropTypes.string,
+        floatingtext: PropTypes.string,
+        errortext   : PropTypes.string,
+        tooltip     : PropTypes.object,
+        onChange    : PropTypes.func,
+        onKeyDown   : PropTypes.func,
     }
 
     state = {

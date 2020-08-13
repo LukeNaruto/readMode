@@ -48,7 +48,7 @@ sr-opt-gp sr-opt-label {
     pointer-events: none;
 }
 
-sr-opt-themes {
+div.simpread-read-root sr-opt-themes {
     display: -webkit-flex;
     flex-flow:row nowrap;
     justify-content:space-between;
@@ -60,7 +60,7 @@ sr-opt-themes {
     padding: 0;
 }
 
-sr-opt-theme {
+div.simpread-read-root sr-opt-theme {
     width: 34px;
     height: 34px;
     line-height: 32px;
@@ -72,22 +72,22 @@ sr-opt-theme {
     cursor: pointer;
 }
 
-sr-opt-theme:hover {
+div.simpread-read-root sr-opt-theme:hover {
     border-color: #069cff;
 }
 
-sr-opt-theme:not(:first-child) {
+div.simpread-read-root sr-opt-theme:not(:first-child) {
     margin-left: 15px;
 }
 
-sr-opt-theme[sr-type="active"] {
+div.simpread-read-root sr-opt-theme[sr-type="active"] {
     border-color: #069cff;
 }
 
 .audio-box{
     position: absolute;
     right: 30px;
-    top: 40px;
+    top: 50px;
     width: 278px;
     height: 138px;
     padding: 24px 15px 24px 24px;
@@ -125,6 +125,9 @@ sr-opt-theme[sr-type="active"] {
 }
 .pre-audio, .next-audio{
     color: #009aff;
+}
+.audioReaded, .audioReaded *{
+    color: #c4c4c4!important;
 }
 .audioReading, .audioReading *{
     color: #fff!important;
@@ -205,4 +208,84 @@ play-rate line line-bg{
 }
 play-rate line line-bg.toLeft{
     background-image: linear-gradient(to left, rgb(0, 126, 255), rgb(0, 192, 255));
+}
+
+.audio-progressBar-box{
+    position: fixed;
+    top: 0;
+    left:0;
+    width: 100%;
+    height: 6px;
+    z-index: 9999;
+    cursor: pointer;
+}
+.audio-progressBar-box.active:hover .audio-progressBar{
+    height: 6px;
+}
+.audio-progressBar-box.active:hover input[type="range"]{
+    visibility: visible;
+}
+.audio-progressBar-box.active .audio-progressBar{
+    height: 2px;
+}
+.audio-progressBar{
+    position: absolute;
+    width: 0;
+    height: 0px;
+    top: 0;
+    left:0;
+    background-image: linear-gradient(to right, rgb(0, 126, 255), rgb(0, 192, 255));
+    box-shadow: rgba(0, 154, 255, 0.2) 0px 4px 6px 0px;
+    
+    transition:height .3s linear;
+}
+
+
+.audio-progressBar-box input[type="range"]{
+    visibility: hidden;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 6px;
+    margin:  0;
+    padding: 0;
+    border: none;
+    outline: none;
+    z-index: 99;
+    /* background-color: red; */
+    background-color: transparent;
+    -webkit-appearance: none;
+}
+.audio-progressBar-box input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+}
+.audio-progressBar-box input[type=range]::-webkit-slider-thumb {
+    position: relative;
+    z-index: 9;
+    height: 6px;
+    width: 6px;
+    background-color: #fff;
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 1px;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-appearance: none;
+    box-shadow: 0 0 8px 0 rgba(0,0,0,.1);
+}
+.toTop{
+    display: none;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 20px;
+    right: -70px;
+    border-radius: 3px;
+    text-align: center;
+    line-height: 50px;
+    background-color: #f7f7f7;
+    z-index: 9;
+    cursor: pointer;
 }

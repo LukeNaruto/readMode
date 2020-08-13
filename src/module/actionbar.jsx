@@ -17,8 +17,8 @@ export default class Actionbar extends React.Component {
     }
 
     static propTypes = {
-        items   : React.PropTypes.array,
-        onAction: React.PropTypes.func,
+        items   : PropTypes.array,
+        onAction: PropTypes.func,
     }
 
     constructor( props ) {

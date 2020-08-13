@@ -13,6 +13,7 @@
     "contextMenus",
     "tabs",
     "storage",
+    "downloads",
     "tts",
     "<all_urls>",
     "chrome://favicon/"
@@ -45,7 +46,8 @@
     "/assets/images/*",
     "/assets/font/*",
     "website_list.json",
-    "options/corb.html"
+    "options/corb.html",
+    "vender/jquery-2.1.1.min.js"
   ],
   "homepage_url": "https://www.minibai.com",
   "offline_enabled" : true,

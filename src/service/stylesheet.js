@@ -97,9 +97,17 @@ function fontSize( value ) {
  */
 function layout( width ) {
     console.log('layout-----', width);
-    
+    const intWidth = parseInt(width);
     $( "#read_container_" ).get(0).style.setProperty("--container-width", width ? width : "");
-    // $( "sr-read" ).css( "width", width ? width : "" );
+    $('#read_container_').css('minWidth', intWidth + 200);
+    toTopRight()
+}
+
+function toTopRight(){
+    const intWidth = $('sr-read').width() + 120;
+    const top = $('.simpread-scroll').height() + $('.simpread-scroll').scrollTop() - 70 - 40 ;
+    const right = ($('#read_container_').width() - intWidth) / 2 - 20 - 50;
+    $('#toTop').css({right, top});
 }
 
 /**
@@ -295,4 +303,5 @@ export {
     specialCSS as SpecialCSS,
     customFontFamily as CustomFontFamily,
     fontfamily as Fontfamily,
+    toTopRight as ToTopRight,
 }

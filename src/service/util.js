@@ -267,27 +267,22 @@ function getPageInfo() {
 function txt2HtmlAppend2Dom(domStr,site){
     const {include, paging, exclude, title} = site;
     let $DOM = $(domStr);
-    $DOM.find(formatSelector(exclude)).remove();
+    exclude.forEach(exclu => {
+        $DOM.find(formatSelector(exclu)).remove();
+    })
     const includeDOM = $DOM.find(formatSelector(include)).html();
-    const bool = /^(\[\[\{)([\S\s]*)(\}\]\])$/.test(paging[1].next);
-
     let nextUrl = '';
-    const h = RegExp.$2;
-    console.log(h,RegExp.$2);
+    console.log(paging[1].next);
     
-    const handleStr = (h).split('.attr');
-    if(handleStr.length == 2 && bool){
-        const dir = handleStr[1].replace(/^\(\'|\'\)$/g,'') || '';
-        console.log(handleStr,dir);
-        nextUrl = $DOM.find(formatSelector(eval(handleStr[0]))).attr(dir);
+    if(paging[1].next){
+        nextUrl = getSelectorStr($DOM, paging[1].next, 'attr');
     }
     
-    console.log(RegExp.$2,paging[1].next);
-    const titleTxt = $DOM.find(formatSelector(title)).text();
+    const titleTxt = getSelectorStr($DOM, title, 'text');
 
     console.log($DOM.find('body'), $DOM.find(formatSelector(include)));
     
-    console.log($DOM, $DOM.find('#j_chapterNext'));
+    console.log(nextUrl, titleTxt);
     return {
         include: includeDOM,
         next: nextUrl,
@@ -295,14 +290,52 @@ function txt2HtmlAppend2Dom(domStr,site){
 
     }
 }
+/**
+ * 
+ * @param {domStr or JqStr} str 
+ * @param {attr, text} dir 
+ */
+function getSelectorStr($DOM, str, dir){
+    str = str.trim();
+    if(str.startsWith('[[')){
+        const bool = /^(\[\[\{)([\S\s]*)(\}\]\])$/.test(str);
 
+
+        let _text = '';
+        //$('.j_chapterName .content-wrap').text()
+        //or
+        //$('#j_chapterPrev').attr('href')
+        const h = RegExp.$2;
+
+        console.log(h,RegExp.$2);
+        if(dir === 'text'){
+            const handleStr = (h).split('.text');// attr
+            if(handleStr.length == 2 && bool){
+                _text = $DOM.find(formatSelector(eval(handleStr[0]))).text();
+            }
+            console.log(RegExp.$2);
+        }else if(dir === 'attr'){
+            const handleStr = (h).split('.attr');// attr
+            if(handleStr.length == 2 && bool){
+                const attrName = handleStr[1].replace(/^\(\'|\'\)$/g,'') || '';
+                console.log(handleStr,dir);
+                _text = $DOM.find(formatSelector(eval(handleStr[0]))).attr(attrName);
+            }
+            console.log(RegExp.$2);
+        }
+        return _text;
+        
+    } else if(str.startsWith('<')){
+        return $DOM.find(formatSelector(str)).text();
+    }
+}
 //"<div class='read-content'>" => div.read-content
 function formatSelector(domStr){
     console.log(domStr);
     
     const dom = $(domStr);
     if(!dom[0]) return null;
-    console.log(dom.attr('class'));
+    console.log(dom.attr('class'), dom);
     
     const tag = dom[0].nodeName.toLowerCase(),
         classStr = dom.attr('class'),

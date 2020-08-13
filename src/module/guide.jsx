@@ -14,7 +14,7 @@ class Guide extends React.Component {
     };
 
     static propsType = {
-        tips: React.PropTypes.array,
+        tips: PropTypes.array,
     };
 
     state = {

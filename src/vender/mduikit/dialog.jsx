@@ -98,8 +98,8 @@ class Dialog extends React.Component {
     }
 
     static propTypes = {
-        onOpen : React.PropTypes.func,
-        onClose: React.PropTypes.func,
+        onOpen : PropTypes.func,
+        onClose: PropTypes.func,
     }
 
     componentDidMount() {

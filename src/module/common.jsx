@@ -15,7 +15,7 @@ import * as msg    from 'message';
 export default class CommonOpt extends React.Component {
 
     static propTypes = {
-        sync : React.PropTypes.func,
+        sync : PropTypes.func,
     }
 
     state = {

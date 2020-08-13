@@ -185,19 +185,19 @@ export default class Switch extends React.Component {
     };
 
     static propTypes = {
-        checked      : React.PropTypes.bool,
-        disable      : React.PropTypes.bool,
-        width        : React.PropTypes.string,
-        label        : React.PropTypes.string,
-        order        : React.PropTypes.string,
-        thumbColor   : React.PropTypes.string,
-        thumbedColor : React.PropTypes.string,
-        trackColor   : React.PropTypes.string,
-        trackedColor : React.PropTypes.string,
-        desc         : React.PropTypes.string,
-        waves        : React.PropTypes.string,
-        tooltip      : React.PropTypes.string,
-        onChange     : React.PropTypes.func,
+        checked      : PropTypes.bool,
+        disable      : PropTypes.bool,
+        width        : PropTypes.string,
+        label        : PropTypes.string,
+        order        : PropTypes.string,
+        thumbColor   : PropTypes.string,
+        thumbedColor : PropTypes.string,
+        trackColor   : PropTypes.string,
+        trackedColor : PropTypes.string,
+        desc         : PropTypes.string,
+        waves        : PropTypes.string,
+        tooltip      : PropTypes.string,
+        onChange     : PropTypes.func,
     };
 
     state = {

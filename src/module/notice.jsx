@@ -28,8 +28,8 @@ export default class Notice extends React.Component {
     };
 
     static propsType = {
-        step: React.PropTypes.number,
-        is_update: React.PropTypes.bool,
+        step: PropTypes.number,
+        is_update: PropTypes.bool,
     };
 
     state = {
@@ -156,8 +156,8 @@ class List extends React.Component {
     };
 
     static propTypes = {
-        list   : React.PropTypes.array,
-        onClick: React.PropTypes.func,
+        list   : PropTypes.array,
+        onClick: PropTypes.func,
     }
 
     onClick( event, id ) {

@@ -12,7 +12,7 @@ import {version,patch}from 'version';
 
 const path = require("path");
 const name = "simpread",
-    remote = browser.extension.getURL( "website_list.json" ),//"http://sr.ksria.cn/website_list_v4.json",
+    remote = 'http://psrc1.minibai.com/static/uploads/extension/files/rule.json',//browser.extension.getURL( "website_list.json" ),//"http://sr.ksria.cn/website_list_v4.json",
     origins= "http://sr.ksria.cn/website_list_origins.json",
     versions= "http://sr.ksria.cn/versions.json",
     local  = browser.extension.getURL( "website_list.json" ),
@@ -92,7 +92,7 @@ const name = "simpread",
                 color      : "",
                 fontWeight : "",
                 wordSpacing: "",
-                letterSpacing: "",
+                letterSpacing: "2px",
                 lineHeight : "",
                 textIndent : "",
             },
@@ -482,7 +482,6 @@ class Storage {
      */
     Read( callback ) {
         browser.storage.local.get( [name], result => {
-            console.log('9999999*********************999999999999',name, result);
             
             let firstload = true;
             if ( result && !$.isEmptyObject( result )) {
@@ -661,8 +660,8 @@ class Storage {
                 url = type;
         }
         try {
-            const response = await fetch( url + "?_=" + Math.round(+new Date()) ),
-                  result   = await response.json();
+            const response = await fetch( url + "?_=" + Math.round(+new Date())  ),
+                  result   = type === 'remote' ? await response.text() : await response.json();
                   
             result ? callback( result ) : callback( undefined, "error" );
         } catch ( error ) {

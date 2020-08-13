@@ -11,8 +11,8 @@ export default class Include extends React.Component {
     }
 
     static propType = {
-        mode : React.PropTypes.oneOf([ "focus", "read" ]),
-        flag : React.PropTypes.object,
+        mode : PropTypes.oneOf([ "focus", "read" ]),
+        flag : PropTypes.object,
     }
 
     state = {

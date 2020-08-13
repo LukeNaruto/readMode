@@ -276,10 +276,10 @@ class ListView extends React.Component {
     };
 
     static propTypes = {
-        waves           : React.PropTypes.string,
-        items           : React.PropTypes.array,
-        active          : React.PropTypes.string,
-        onChange        : React.PropTypes.func,
+        waves           : PropTypes.string,
+        items           : PropTypes.array,
+        active          : PropTypes.string,
+        onChange        : PropTypes.func,
     };
 
     style = cssinjs_list()
@@ -356,16 +356,16 @@ export default class SelectField extends React.Component {
     };
 
     static propTypes = {
-        name         : React.PropTypes.string,
-        disable      : React.PropTypes.bool,
-        width        : React.PropTypes.string,
-        placeholder  : React.PropTypes.string,
-        floatingtext : React.PropTypes.string,
-        errortext    : React.PropTypes.string,
-        items        : React.PropTypes.array,
-        waves        : React.PropTypes.string,
-        tooltip      : React.PropTypes.object,
-        onChange     : React.PropTypes.func,
+        name         : PropTypes.string,
+        disable      : PropTypes.bool,
+        width        : PropTypes.string,
+        placeholder  : PropTypes.string,
+        floatingtext : PropTypes.string,
+        errortext    : PropTypes.string,
+        items        : PropTypes.array,
+        waves        : PropTypes.string,
+        tooltip      : PropTypes.object,
+        onChange     : PropTypes.func,
     };
 
     state = {

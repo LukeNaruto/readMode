@@ -239,16 +239,16 @@ export default class Tabs extends React.Component {
     };
 
     static propTypes = {
-        items    : React.PropTypes.array,
-        color    : React.PropTypes.string,
-        activeColor : React.PropTypes.string,
-        bgColor     : React.PropTypes.string,
-        headerStyle : React.PropTypes.object,
-        groupsStyle : React.PropTypes.object,
-        borderStyle : React.PropTypes.object,
-        waves    : React.PropTypes.string,
-        tooltip  : React.PropTypes.string,
-        onChange : React.PropTypes.func,
+        items    : PropTypes.array,
+        color    : PropTypes.string,
+        activeColor : PropTypes.string,
+        bgColor     : PropTypes.string,
+        headerStyle : PropTypes.object,
+        groupsStyle : PropTypes.object,
+        borderStyle : PropTypes.object,
+        waves    : PropTypes.string,
+        tooltip  : PropTypes.string,
+        onChange : PropTypes.func,
     };
 
     style = cssinjs();

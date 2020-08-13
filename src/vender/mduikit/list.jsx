@@ -424,22 +424,22 @@ export default class List extends React.Component {
     };
 
     static PropTypes = {
-       title       : React.PropTypes.string,
+       title       : PropTypes.string,
 
-       items       : React.PropTypes.array,
-       actionItems : React.PropTypes.array,
+       items       : PropTypes.array,
+       actionItems : PropTypes.array,
 
-       onAction    : React.PropTypes.func,
+       onAction    : PropTypes.func,
 
-       acIconWaves : React.PropTypes.string,
-       acItemWaves : React.PropTypes.string,
+       acIconWaves : PropTypes.string,
+       acItemWaves : PropTypes.string,
 
-       priStyle    : React.PropTypes.object,
-       secStyle    : React.PropTypes.object,
-       contentStyle: React.PropTypes.object,
+       priStyle    : PropTypes.object,
+       secStyle    : PropTypes.object,
+       contentStyle: PropTypes.object,
 
-       priBgColor  : React.PropTypes.string,
-       secBgColor  : React.PropTypes.string,
+       priBgColor  : PropTypes.string,
+       secBgColor  : PropTypes.string,
     };
 
     style = cssinjs()

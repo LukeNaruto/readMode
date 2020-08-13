@@ -21,12 +21,12 @@ export class Feedback extends React.Component {
     }
 
     static propType = {
-        user     : React.PropTypes.object,
-        url      : React.PropTypes.string,
-        version  : React.PropTypes.string,
-        anonymous: React.PropTypes.bool,
-        rate     : React.PropTypes.bool,
-        product  : React.PropTypes.string,
+        user     : PropTypes.object,
+        url      : PropTypes.string,
+        version  : PropTypes.string,
+        anonymous: PropTypes.bool,
+        rate     : PropTypes.bool,
+        product  : PropTypes.string,
     }
 
     state = {

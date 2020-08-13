@@ -36,6 +36,7 @@ li{
   float: right;
 }
 .title .title-right span {
+  float: left;
   font-size: 12px;
   color: var(--blue);
   margin-left: 16px;
@@ -46,6 +47,9 @@ li{
   color: inherit;
 }
 .title .title-right span.no-support .iconfont{
+  float: left;
+  margin-right: 6px;
+  line-height: 18px;
   color: #ff0013;
 }
 .white-box{

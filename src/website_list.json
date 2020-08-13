@@ -834,7 +834,7 @@
         "desc"    : "",
         "include" : "<div class='article-holder'>",
         "exclude" : [
-            ""
+            "<div class='card-container'>"
         ]
     },{
         "name"    : "www.yixieshi.com",
@@ -2359,7 +2359,7 @@
         ]
     },{
         "name"    : "dy.163.com",
-        "url"     : "http*://dy.163.com/v2/article/detail/*.html",
+        "url"     : "http*://dy.163.com/article/*.html",
         "title"   : "<h2>",
         "desc"    : "",
         "include" : "<div id='content'>",
@@ -2368,7 +2368,7 @@
         ]
     },{
         "name"    : "tech.163.com",
-        "url"     : "http*://*.163.com/**/*/*.html",
+        "url"     : "http*://tech.163.com/**/*/*.html",
         "title"   : "[[{$('.post_content_main').find('h1').text()}]]",
         "desc"    : "",
         "include" : "<div class='post_text'>",
@@ -2916,11 +2916,11 @@
             {"prev" : "[[{$('#j_chapterPrev').attr('href')}]]"},
             {"next" : "[[{$('#j_chapterNext').attr('href')}]]"}
         ],
-        "title"   : "<h3 class='j_chapterName'>",
+        "title"   : "[[{$('.j_chapterName .content-wrap').text()}]]",
         "desc"    : "",
         "include" : "<div class='read-content'>",
         "exclude" : [
-            ""
+            "<span class='review-count'>"
         ]
     },{
         "name"    : "vipreader.qidian.com",

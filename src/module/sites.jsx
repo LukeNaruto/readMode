@@ -16,7 +16,7 @@ class Card extends React.Component {
     };
 
     static propTypes = {
-        info         : React.PropTypes.object,
+        info         : PropTypes.object,
     };
 
     update() {
@@ -80,7 +80,7 @@ class Cards extends React.Component {
     }
 
     static propTypes = {
-        onChange : React.PropTypes.func,
+        onChange : PropTypes.func,
     };
 
     onChange( type ) {

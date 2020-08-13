@@ -55,6 +55,8 @@ $('#showAdd').on('click', function(event){
 sendMessageToTab(msg.MESSAGE_ACTION.read_active, bool => {
   mode_switch = bool;
   browser.runtime.sendMessage( msg.Add( msg.MESSAGE_ACTION.icon_code), (res) => {
+    console.log(22,res);
+    
     const { iconCode } = res;
     let text = mode_switch ? '退出模式' : '进入模式';
     ~iconCode ? $("#siteCheck").on('click', function(){
@@ -62,7 +64,7 @@ sendMessageToTab(msg.MESSAGE_ACTION.read_active, bool => {
       text = mode_switch ? '退出模式' : '进入模式';
       $(this).text(text).attr('title',text)
       browserClick();
-      window.close();
+      // window.close();
     }).text(text).attr('title',text).removeClass('no-support') : null;
   });
 });
@@ -89,7 +91,7 @@ function setList(value) {
 }
 
 function browserClick(){
-  chrome.tabs.query( { "active": true }, tabs => { 
+  chrome.tabs.query( { "active": true, "currentWindow": true }, tabs => { 
     tab = tabs[0];
     chrome.tabs.sendMessage( tab.id, {type: 'browser_click'});
   });

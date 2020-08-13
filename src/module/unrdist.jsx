@@ -38,9 +38,9 @@ export default class Unrdist extends React.Component {
     };
 
     static propsType = {
-        list: React.PropTypes.array,
-        step: React.PropTypes.number,
-        onLoadMoreClick: React.PropTypes.func,
+        list: PropTypes.array,
+        step: PropTypes.number,
+        onLoadMoreClick: PropTypes.func,
     };
 
     state = {

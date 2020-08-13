@@ -105,11 +105,11 @@ class ToolTip extends React.Component {
     }
 
     static propTypes = {
-        root     : React.PropTypes.string,
-        text     : React.PropTypes.string,
-        position : React.PropTypes.oneOf([ "bottom", "top", "left", "right" ]),
-        delay    : React.PropTypes.number,
-        $item    : React.PropTypes.any,
+        root     : PropTypes.string,
+        text     : PropTypes.string,
+        position : PropTypes.oneOf([ "bottom", "top", "left", "right" ]),
+        delay    : PropTypes.number,
+        $item    : PropTypes.any,
     }
 
     state = {

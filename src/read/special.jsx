@@ -9,8 +9,8 @@ const default_src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAA
 export class Multiple extends React.Component {
 
     static defaultProps = {
-        include: React.PropTypes.any,
-        avatar : React.PropTypes.array,
+        include: PropTypes.any,
+        avatar : PropTypes.array,
     }
 
     render() {
@@ -45,7 +45,7 @@ export class Multiple extends React.Component {
 export class Paging extends React.Component {
 
     static defaultProps = {
-        paging: React.PropTypes.array,
+        paging: PropTypes.array,
     }
 
     state = {

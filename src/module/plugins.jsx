@@ -16,7 +16,7 @@ class Card extends React.Component {
     };
 
     static propTypes = {
-        plugin         : React.PropTypes.object,
+        plugin         : PropTypes.object,
     };
 
     update() {
@@ -99,8 +99,8 @@ class Cards extends React.Component {
     };
 
     static propTypes = {
-        plugins         : React.PropTypes.array,
-        onChange        : React.PropTypes.func,
+        plugins         : PropTypes.array,
+        onChange        : PropTypes.func,
     };
 
     render() {

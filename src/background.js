@@ -13,6 +13,8 @@ import * as permission
 import * as tips   from 'tips';
 import PureRead    from 'puread';
 
+import md5         from 'js-md5';
+
 // global update site tab id
 let upTabId = -1;
 
@@ -21,20 +23,115 @@ let upTabId = -1;
  */
 
 console.log('Read-----1--',ver,storage);
+function authcode(str,  key, expiry) {
+    var key = key ? key : '';
+    var expiry = expiry ? expiry : 0;
+    var tmp, tmpstr;
+    var ckey_length = 4;
+    key = md5(key);
+
+    // 密匙a会参与加解密
+    var keya = md5(key.substr(0, 16));
+    // 密匙b会用来做数据完整性验证
+    var keyb = md5(key.substr(16, 16));
+    // 密匙c用于变化生成的密文
+    // IE下不支持substr第一个参数为负数的情况
+    if(ckey_length){
+        var keyc = str.substr(0, ckey_length);
+    }else{
+        var keyc = '';
+    }
+    // 参与运算的密匙
+    var cryptkey = keya + md5(keya + keyc);
+
+    var strbuf;
+
+    str = str.substr(ckey_length);
+    strbuf = atob(str);
+
+
+    var box = new Array(256);
+    for (var i = 0; i < 256; i++) {
+        box[i] = i;
+    }
+    var rndkey = new Array();
+    // 产生密匙簿
+    for (var i = 0; i < 256; i++) {
+        rndkey[i] = cryptkey.charCodeAt(i % cryptkey.length);
+    }
+    // 用固定的算法，打乱密匙簿，增加随机性，好像很复杂，实际上对并不会增加密文的强度
+    for (var j = i = 0; i < 256; i++) {
+        j = (j + box[i] + rndkey[i]) % 256;
+        tmp = box[i];
+        box[i] = box[j];
+        box[j] = tmp;
+    }
+
+    // 核心加解密部分
+    var s = '';
+    //IE下不支持直接通过下标访问字符串的字符，需要先转换为数组
+    strbuf = strbuf.split('');
+    for (var a = j = i = 0; i < strbuf.length; i++) {
+        a = (a + 1) % 256;
+        j = (j + box[a]) % 256;
+        tmp = box[a];
+        box[a] = box[j];
+        box[j] = tmp;
+        // 从密匙簿得出密匙进行异或，再转成字符
+        s += chr(ord(strbuf[i])^(box[(box[a] + box[j]) % 256]));
+    }
+
+    if ((s.substr(0, 10) == 0 || s.substr(0, 10) - time() > 0) && s.substr(10, 16) == md5(s.substr(26) + keyb).substr(0, 16)) {
+        s = s.substr(26);
+    } else {
+        s = '';
+    }
+    function time() {
+        var unixtime_ms = new Date().getTime();
+        return parseInt(unixtime_ms / 1000);
+    }
+    
+    function microtime(get_as_float) {
+        var unixtime_ms = new Date().getTime();
+        var sec = parseInt(unixtime_ms / 1000);
+        return get_as_float ? (unixtime_ms / 1000) : (unixtime_ms - (sec * 1000)) / 1000 + ' ' + sec;
+    }
+    function chr(s) {
+        return String.fromCharCode(s);
+    }
+    function ord(s) {
+        return s.charCodeAt();
+    }
+    return (s);
+}
 
 storage.Read(async () => {
     
     storage.puread = new PureRead( storage.sites );
     let first_ = local.Firstload();
     console.log('storage.Read--',first_, local.Count(), ver.version);
-    storage.GetRemote( "remote", ( result, error ) => {
-        if ( !error ) {
-            storage.pr.Addsites( result );
-            storage.Writesite( storage.pr.sites, getNewsitesHandler );
+    storage.GetRemote( "remote", async ( result, error ) => {
+        // console.log(321,result, error);
+        let _result;
+        if ( false ) {
             
+            const key = 'minibai#001';
+            console.log(12312,key);
+            _result = JSON.parse(decodeURI(atob(authcode(atob(result),key))));
+            console.log(12312,_result);
+            
+            
+        }else{
+            await storage.GetRemote( "local", ( loc_result, loc_error ) => {
+                if(!loc_error) _result = loc_result;
+                console.log('local', loc_result, loc_error);
+            });
         }
+        storage.pr.Addsites( _result );
+        storage.Writesite( storage.pr.sites, getNewsitesHandler );
+        console.log(321);
     });
-    const fontFamilyRes = await fetch( 'https://api4.minibai.com/g/1/gft.api?t=1&v=0' ),
+    const fontFamilyRes = await fetch( 'https://api4.minibai.com/g/1/gft.api?t=2&v=0' ),
          fontFamilies   = await fontFamilyRes.json();
          
     storage.read.fontFamilies = fontFamilies.bd.data || [];
@@ -145,7 +242,20 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
  * Listen runtime message, include: `download`, `base64` && `permission`
  */
 browser.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
-    if ( request.type == msg.MESSAGE_ACTION.download ) {
+    if(request.type == msg.MESSAGE_ACTION.image_download){
+        console.log('------------downloads-image', request);
+        const {status, src, uri} = request.value;
+        if(status){
+            browser.tabs.create({ url: `list.html?${uri}`, selected: true },(tab) => {});
+        }else{
+            browser.downloads.download({
+                url: src,
+                conflictAction: "uniquify",
+                method: "GET",
+            },(res) => {});
+        }
+        
+    }else if ( request.type == msg.MESSAGE_ACTION.download ) {
         const { data, name } = request.value;
         const blob = new Blob([data], {
             type: "html/plain;charset=utf-8"
@@ -226,7 +336,7 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
             .then(response => response.text())
             .catch(error => console.error('Error:', error))
             .then(response => {
-                console.log('Success:', response)
+                // console.log('Success:', response)
                 response && sendResponse(response);
             });
             break;
@@ -278,6 +388,8 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
             break;
         case msg.MESSAGE_ACTION.save_verify:
             getCurTab( { "active": true, "currentWindow": true },tabs=>{
+                console.log(tabs);
+                
                 sendResponse( watch.Lock( request.value.url, tabs[0].id ));
             });
             break;
@@ -352,8 +464,13 @@ browser.tabs.onActivated.addListener( function( active ) {
 /**
  * Listen chrome tab update message, include: `tab_selected`
  */
+let can_update = true;
 browser.tabs.onUpdated.addListener( function( tabId, changeInfo, tab ) {
+    if(changeInfo.status == "loading"){
+        can_update = !changeInfo.url;
+    }
     watch.Pull( tabId );
+    console.log(changeInfo,can_update);
     if ( changeInfo.status == "complete" ) {
         console.log('onUpdated--', tabId, changeInfo, tab);
         
@@ -395,7 +512,7 @@ browser.tabs.onUpdated.addListener( function( tabId, changeInfo, tab ) {
         }
 
         if ( !tab.url.startsWith( "chrome://" ) ) {
-            browser.tabs.sendMessage( tabId, msg.Add( msg.MESSAGE_ACTION.tab_selected, { is_update: true } ));
+            can_update && browser.tabs.sendMessage( tabId, msg.Add( msg.MESSAGE_ACTION.tab_selected, { is_update: true } ));
         } else {
             
             console.log(3,'set--MenuAndIcon',tab.id, -1);
@@ -437,6 +554,8 @@ function getCurTab( query, callback ) {
  * @param {int} -1: disable icon;
  */
 function setMenuAndIcon( id, code ) {
+    console.log('setMenuAndIcon--',id,code);
+    
     menu.Create( "read" );
     storage.iconCode(null, code);
     

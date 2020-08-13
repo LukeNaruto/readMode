@@ -1,6 +1,7 @@
 console.log( "=== simpread message load ===" )
 
 const action = {
+    image_download : 'image_download',
     notify_preload : 'notify_preload',
     reload_whitelist: 'reload_whitelist',
     read_active    : 'read_active',

@@ -229,10 +229,10 @@ export default class Fab extends React.Component {
     }
 
     static propTypes = {
-        items    : React.PropTypes.object,
-        tooltip  : React.PropTypes.object,
-        waves    : React.PropTypes.string,
-        onAction : React.PropTypes.func,
+        items    : PropTypes.object,
+        tooltip  : PropTypes.object,
+        waves    : PropTypes.string,
+        onAction : PropTypes.func,
     }
 
     state = {
