@@ -241,7 +241,7 @@ function focusMode() {
  * Read mode
  */
 function readMode() {
-    console.log( "=== simpread read mode active ===" )
+    console.log( "=== simpread read mode active ===", pr.state )
     
     if(pr.state !== "adapter") return;
     var s = document.createElement('script');
@@ -400,6 +400,7 @@ function browserAction( is_update ) {
  * Pure Read
 */
 function pRead() {
+    console.log( "current puread object is -----  ", JSON.parse(JSON.stringify(storage.sites)))
     pr = new PureRead( storage.sites );
     pr.cleanup = storage.read.cleanup == undefined ? true  : storage.read.cleanup;
     pr.pure    = storage.read.pure    == undefined ? false : storage.read.pure;

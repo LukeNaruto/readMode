@@ -431,19 +431,21 @@ class AudioBox extends React.Component{
         this.len = (max - min) / step;
         console.log(storage.read);
     }
+    setPlayA(){
+        const {audio} = this.props;
+        this.setState({
+            playA: !audio.paused,
+        },() => {
+            this.props.onChangePlaying(this.state.playA);
+        });
+    }
     componentDidMount() {
         const {value,audio} = this.props;
         this.lineRepaint(value);
-        audio.addEventListener('play',(res)=>{
-            this.setState({
-                playA: !audio.paused,
-            }); 
-        });
-        audio.addEventListener('pause',(res)=>{
-            this.setState({
-                playA: !audio.paused,
-            }); 
-        });
+        audio.removeEventListener('play',this.setPlayA.bind(this));
+        audio.removeEventListener('pause',this.setPlayA.bind(this));
+        audio.addEventListener('play',this.setPlayA.bind(this));
+        audio.addEventListener('pause',this.setPlayA.bind(this));
         this.setState({
             playA: !audio.paused,
         }); 
@@ -647,10 +649,12 @@ export default class Fap extends React.Component {
         if ( event.target.tagName.toLowerCase() == "panel-bg" ) {
             const $panelbg = $( this.refs.bg ),
                   style    = { ...this.style };
-            if(!this.playA){
+            if(!this.playing){
                 $('.readDOM').removeClass('audioReaded');
                 $('.audio-progressBar-box').removeClass('active');
             }
+            
+            $('sr-rd-crlbar').removeClass('unscrolling');
             ReactDOM.unmountComponentAtNode( $panelbg[0] );
             $panelbg.css({ ...style.panel_bg });
             $(this.refs[this.state.active]).removeClass('active');
@@ -695,7 +699,7 @@ export default class Fap extends React.Component {
             const dom = $('.readDOM').get(count);
             if(!dom) return;
             const offsetTop = dom.offsetTop + dom.clientHeight * .5;
-            $('.simpread-read-root').scrollTop(offsetTop - distance);
+            $('.simpread-scroll').scrollTop(offsetTop - distance);
             
             await setTimeout(()=>{
                 
@@ -703,12 +707,12 @@ export default class Fap extends React.Component {
                 audio.play().then(()=>{
                     console.log(audio.duration, audio.currentTime,count ,this.count);
                     
-                    $('.readDOM').eq(count).addClass('audioReading ');
+                    $('.readDOM').eq(count).addClass('audioReading');
                     $('.readDOM').removeClass('audioReaded');
                     $('.audio-progressBar-box').addClass('active');
-                    for(let i=0;$('.readDOM').length > i;i++){
+                    let i = this.count;
+                    for(;i >= 0;i--){
                         $('.readDOM').eq(i).addClass('audioReaded');
-                        if(i >= count) break;
                     }
                 }).catch(err=>{
                     const type = catchCount > count ? 'pre' : 'next';
@@ -774,6 +778,9 @@ export default class Fap extends React.Component {
         step: .25,
         pointer: 1
     };
+    onChangePlaying(bool){
+        this.playing = bool
+    }
     audioRender(){
         const $panelbg = $( this.refs.bg );
         const {audio} = this;
@@ -782,8 +789,9 @@ export default class Fap extends React.Component {
             const style = { ...this.style };
             $(this.refs[this.state.active]).addClass('active');
             $panelbg.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
+            $('sr-rd-crlbar').addClass('unscrolling');
             ReactDOM.render( 
-                <AudioBox audio={audio} value={audio.playbackRate} desc="倍速" options={this.audioOptions} playA={this.playA} onChange={(v)=>this.changeAudioRate(v)} audioSocket={(type, revise) => this.audioSocket(type,revise)} />, $panelbg[0] );
+                <AudioBox audio={audio} value={audio.playbackRate} desc="倍速" options={this.audioOptions} playA={this.playA} onChangePlaying={(bool)=>this.onChangePlaying(bool)} onChange={(v)=>this.changeAudioRate(v)} audioSocket={(type, revise) => this.audioSocket(type,revise)} />, $panelbg[0] );
         }
     }
     panelRender() {
@@ -791,6 +799,7 @@ export default class Fap extends React.Component {
         if ( $panelbg.length > 0 ) {
             const style = { ...this.style };
             $(this.refs[this.state.active]).addClass('active');
+            $('sr-rd-crlbar').addClass('unscrolling');
             $panelbg.css({ ...style.panel_bg, ...{ "display": "block" , opacity: 1 }});
             ReactDOM.render( 
                 <Panel 

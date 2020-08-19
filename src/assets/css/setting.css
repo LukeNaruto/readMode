@@ -289,3 +289,6 @@ play-rate line line-bg.toLeft{
     z-index: 9;
     cursor: pointer;
 }
+.toTop > i{
+    font-size: 24px;
+}

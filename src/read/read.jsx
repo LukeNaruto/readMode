@@ -40,13 +40,16 @@ class SrRead extends React.Component{
         const {wrapper} = this.props;
         setTimeout(()=>{
             $('sr-rd-content > *').addClass('readDOM');
+            $('sr-rd-content').eq(load_count).find('img').each((i,el)=>{
+                !el.parentNode.classList.contains('sr-rd-content-center') && $(el).wrap("<div class='sr-rd-content-center'></div>")
+            })
+            
         });
     }
     render(){
         const {wrapper} = this.props;
         //dangerouslySetInnerHTML={{__html: wrapper.include }} 无法渲染/<!--.*?-->/g,pureread正则有问题
         // wrapper.include = wrapper.include.replace(/<!--.*?-->/g, '');
-        
         const Article = <sr-rd-content dangerouslySetInnerHTML={{__html: wrapper.include }}></sr-rd-content>;
         return(
             <sr-read >
@@ -96,9 +99,9 @@ class ImgShowBox extends React.Component {
         });
     }
     download(status){
-        const {state: { src }, props: { srcImgs }} = this;
+        const {state: { src, idx }, props: { srcImgs }} = this;
         browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.image_download, 
-            { status, src, uri: window.location.href}), 
+            { status, srcImgs, idx }), 
             function (res) {
 
             }
@@ -141,16 +144,9 @@ class ImgShowBox extends React.Component {
             $('.img-show-box').on('mousemove', function(m_e){
                 let x = curX + m_e.pageX - d_e.pageX, 
                     y = curY + m_e.pageY - d_e.pageY;
-                if(x > 0){
-                    x = maxX - 20 < x ? maxX - 20 : x;
-                }else{
-                    x = -(maxX - 20) > x ? -(maxX - 20) : x;
-                }
-                if(y > 0){
-                    y = maxY - 20 < y ? maxY - 20 : y;
-                }else{
-                    y = -(maxY - 20) > y ? -(maxY - 20) : y;
-                }
+                x = maxX - 20 < Math.abs(x) ? (maxX - 20) * (x > 0 ? 1 : -1) : x;
+                y = maxY - 20 < Math.abs(y) ? (maxY - 20) * (y > 0 ? 1 : -1) : y;
+
                 _this.refs.curImg.style.cursor = 'pointer';
                 _this.setState((preState)=>{
                     return {
@@ -179,23 +175,22 @@ class ImgShowBox extends React.Component {
     render(){
         // todo
         const {state:{src,idx, percent,x,y},len} = this;
-        const Btns = (<div>
-                    <div onClick={()=>this.close()} className="btn-close btn-circle"><i className="iconfont icon-yuedumoshi_guanbi"></i></div>
-                        <div onClick={()=>this.switchImg(0)} className={`btn-pre btn-circle ${len <= 1 && 'disable'}`}>
-                            <i className="iconfont icon-yuedumoshi_youxuanzhuan"></i>
-                        </div>
-                        <div onClick={()=>this.switchImg(1)} className={`btn-next btn-circle ${len <= 1 && 'disable'}`}>
-                            <i className="iconfont icon-yuedumoshi_zuoxuanzhuan"></i>
-                        </div>
-                </div>);
+        const Btns = <div>
+            <div onClick={()=>this.close()} className="btn-close btn-circle"><i className="iconfont icon-yuedumoshi_guanbi"></i></div>
+                <div onClick={()=>this.switchImg(0)} className={`btn-pre btn-circle ${len <= 1 && 'disable'}`}>
+                    <i className="iconfont icon-yuedumoshi_youxuanzhuan"></i>
+                </div>
+                <div onClick={()=>this.switchImg(1)} className={`btn-next btn-circle ${len <= 1 && 'disable'}`}>
+                    <i className="iconfont icon-yuedumoshi_zuoxuanzhuan"></i>
+                </div>
+        </div>;
         const btnGroups = <ul className="btn-groups">
             <li onClick={()=>this.download(0)}><i className="iconfont icon-yuedumoshi_dantuxiazai"></i></li>
-            <li onClick={()=>this.download(1)}><i className="iconfont icon-yuedumoshi_duotuxiazai"></i></li>
+            <li onClick={()=>this.download(1)} title="在使用批量下载时，请在浏览器设置中关闭“下载前询问每个文件的保存位置，否则会弹出多个下载窗口”"><i className="iconfont icon-yuedumoshi_duotuxiazai"></i></li>
             <li><a href="https://bbs.minibai.com/" title="反馈" target="_blank"><i className="iconfont icon-yuedumoshi_fankui"></i></a> </li>
             <li>{`${ idx + 1 }  |  ${len}`}</li>
         </ul>;
-        const Img = (
-            <img ref="curImg" draggable="false" src={src} alt="image" style={{transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />);
+        const Img = <img ref="curImg" draggable="false" src={src} alt="image" style={{transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />;
         if(!this.imgWidth && !this.imgHeight){
             const images = new Image();
             images.src = src;
@@ -208,7 +203,6 @@ class ImgShowBox extends React.Component {
                 <div className="show-box">{Img}</div>
                 {Btns}
                 {btnGroups}
-                
             </div>
         )
     }
@@ -228,6 +222,28 @@ class Read extends React.Component {
         return true;
     }
 
+    viewImg(){
+        console.log('componentDidUpdate----222---');
+        // todo
+        $('#read_container_ img').unbind('click');
+        setTimeout(()=>{
+            console.log('componentDidUpdate-------');
+            $('#read_container_ img').on('click', function(){
+                const idx = $('#read_container_ img').index($(this));
+                let $imgShowBox = $('#imgShowBox');
+                if(!$imgShowBox.length) {
+                    $imgShowBox = $('<div id="imgShowBox"></div>');
+                    $('.simpread-read-root').append($imgShowBox);
+                }
+                const srcImgs = []
+                $('#read_container_ img').each((i, img)=> {
+                    srcImgs.push($(img).attr('src'))
+                })
+                ReactDOM.render(<ImgShowBox idx={idx} srcImgs={srcImgs} />, $imgShowBox[0]); 
+            })
+        },500);
+    }
+
     componentWillMount() {
         ss.CustomFontFamily(storage.read.fontFamilies);
         $( "body" ).addClass( "simpread-hidden" );
@@ -238,16 +254,18 @@ class Read extends React.Component {
             $( "head" ).append( '<link rel="stylesheet" class="simpread-fs-style" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/fontawesome.min.css" />' );
         }
     }
-
+    componentWillUpdate (){
+        this.viewImg();
+    }
     async componentDidMount() {
         // if ( load_count > 0 && !this.verifyContent() ) {
         //     return;
         // }
     
+        this.viewImg();
         let scrollCount = 0;
         let unshakeTimer = null;
         
-        this.renderPreload(this);
         $root
             .addClass( "simpread-font" )
             .addClass( theme )
@@ -273,7 +291,7 @@ class Read extends React.Component {
                         scrollCount = scrollTemp;
                     },100);
                     
-                    this.renderPreload(this)
+                    this.renderPreload();
                 })
                 .on('click', function(){
                     $('sr-rd-crlbar').css({'marginTop': 0});
@@ -319,28 +337,16 @@ class Read extends React.Component {
             this.verifyContent();
             tips.Render( storage.option.plugins );
             tips.Help( storage.statistics );
+            this.renderPreload();
         }, 50 );
-        // todo
-        $('#read_container_ img').on('click', function(){
-            const idx = $('#read_container_ img').index($(this));
-            let $imgShowBox = $('#imgShowBox');
-            if(!$imgShowBox.length) {
-                $imgShowBox = $('<div id="imgShowBox"></div>');
-                $('.simpread-read-root').append($imgShowBox);
-            }
-            const srcImgs = []
-            $('#read_container_ img').each((i, img)=> {
-                srcImgs.push($(img).attr('src'))
-            })
-            ReactDOM.render(<ImgShowBox idx={idx} srcImgs={srcImgs} />, $imgShowBox[0]); 
-        })
+        
     }
 
     async renderPreload() {
         let {locked, nextUrl} = this.state;
         const preload = storage.read.preload;
         const paging = this.props.wrapper.paging;
-        // console.log(preload,locked, !locked && paging && paging.length > 0 && preload, paging);
+        console.log(preload,locked, !locked && paging && paging.length > 0 && preload, paging);
         
         if (!locked && paging && paging.length > 0 && preload) {
             const clientH = $('#read_container_').height() + 40;
@@ -352,16 +358,23 @@ class Read extends React.Component {
                     ...pre,
                     locked: true,
                 }));
-                browser.runtime.sendMessage(msg.Add(msg.MESSAGE_ACTION.notify_preload, { url: nextUrl }), (res) => {
-                    // console.log(res);
-                    const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
-                    // console.log(nextContent,this.state.htmls);
-                     this.setState((pre) => ({
-                        ...pre,
-                        htmls: [...pre.htmls, nextContent],
-                        locked: false,
-                        nextUrl: nextContent.next,
-                    }));
+                nextUrl && $.ajax({
+                    url: nextUrl,
+                    beforeSend:()=>{},
+                    success:(res)=>{
+                        const nextContent = Txt2HtmlAppend2Dom(res, storage.current.site);
+                        console.log('---Txt2HtmlAppend2Dom-----------',nextContent,this.state.htmls);
+                        this.setState((pre) => ({
+                            ...pre,
+                            htmls: [...pre.htmls, nextContent],
+                            locked: false,
+                            nextUrl: nextContent.next,
+                        }),()=>{
+                            load_count++;
+                            console.log(this.state.htmls);
+                        });
+                        // storage.pr.Beautify( $( "sr-rd-content" ) );
+                    },
                 });
             }
         }
@@ -499,7 +512,7 @@ function Render( callMathjax = true ) {
     loadPlugins( "read_start" );
     callMathjax && mathJaxMode();
     storage.pr.ReadMode();
-    console.log(JSON.parse(JSON.stringify(storage)));
+    console.log(JSON.parse(JSON.stringify(storage)),storage.pr.html.include);
     if ( typeof storage.pr.html.include == "string" && storage.pr.html.include.startsWith( "<sr-rd-content-error>" ) ) {
         console.warn( '=== Adapter failed call Readability View ===' )
         storage.pr.Readability();
@@ -570,12 +583,13 @@ function Exit() {
  * MathJax Mode
  */
 function mathJaxMode() {
+    console.warn( '=== MathJax Mode =22222==' )
     if ( storage.pr.isMathJax() && storage.pr.state == "temp" ) {
         console.warn( '=== MathJax Mode ===' )
         const dom = storage.pr.MathJaxMode();
         console.log( 'current get dom is ', dom )
         if ( typeof dom == "undefined" ) {
-            new Notify().Render( "<a href='http://ksria.com/simpread/docs/#/词法分析引擎?id=智能感知' target='_blank' >智能感知</a> 失败，请移动鼠标框选。" );
+            // new Notify().Render( "<a href='http://ksria.com/simpread/docs/#/词法分析引擎?id=智能感知' target='_blank' >智能感知</a> 失败，请移动鼠标框选。" );
             Highlight().done( dom => {
                 const rerender = element => {
                     storage.pr.TempMode( "read", element );

@@ -17,7 +17,12 @@ import md5         from 'js-md5';
 
 // global update site tab id
 let upTabId = -1;
+const manifestData = chrome.runtime.getManifest();
+const {cid,pid} = manifestData;
 
+const first_ = local.Firstload();
+
+if(true) postInfo(1);
 /**
  * Sevice: storage Get data form chrome storage
  */
@@ -106,21 +111,19 @@ function authcode(str,  key, expiry) {
 }
 
 storage.Read(async () => {
-    
+    console.log(JSON.parse(JSON.stringify(storage.sites)));
     storage.puread = new PureRead( storage.sites );
-    let first_ = local.Firstload();
+    console.log(JSON.parse(JSON.stringify(storage.sites)));
+    console.log(local.Count(), ver.version , storage.version, ver.patch , storage.patch);
     console.log('storage.Read--',first_, local.Count(), ver.version);
     storage.GetRemote( "remote", async ( result, error ) => {
         // console.log(321,result, error);
         let _result;
-        if ( false ) {
-            
+        if ( !error ) {
             const key = 'minibai#001';
             console.log(12312,key);
             _result = JSON.parse(decodeURI(atob(authcode(atob(result),key))));
             console.log(12312,_result);
-            
-            
         }else{
             await storage.GetRemote( "local", ( loc_result, loc_error ) => {
                 if(!loc_error) _result = loc_result;
@@ -137,7 +140,7 @@ storage.Read(async () => {
     storage.read.fontFamilies = fontFamilies.bd.data || [];
     storage.Write();
     console.log('Read-------',ver,storage);
-    // setTimeout( ()=>uninstall(), 100 );
+    setTimeout( ()=>uninstall(), 100 );
 });
 
 /**
@@ -244,12 +247,22 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
 browser.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
     if(request.type == msg.MESSAGE_ACTION.image_download){
         console.log('------------downloads-image', request);
-        const {status, src, uri} = request.value;
+        const {status, idx, srcImgs} = request.value;
         if(status){
-            browser.tabs.create({ url: `list.html?${uri}`, selected: true },(tab) => {});
+            
+            srcImgs.forEach((item) => {
+                browser.downloads.download(
+                {
+                  url: item,
+                  conflictAction: "uniquify",
+                  method: "GET",
+                },
+                (res) => {}
+              );
+            });
         }else{
             browser.downloads.download({
-                url: src,
+                url: srcImgs[idx],
                 conflictAction: "uniquify",
                 method: "GET",
             },(res) => {});
@@ -586,6 +599,39 @@ function tracked({ eventCategory, eventAction, eventValue }) {
  * Uninstall
  */
 function uninstall() {
-    browser.runtime.setUninstallURL( storage.option.uninstall ? storage.service + "/uninstall" : "" );
-    tracked({ eventCategory: "install", eventAction: "install", eventValue: "uninstall" });
+    // browser.runtime.setUninstallURL( 'https://www.baidu.com' );
+    // tracked({ eventCategory: "install", eventAction: "install", eventValue: "uninstall" });
+    // browser.runtime.onSuspend.addListener(() => {
+    //     browser.tabs.create({ url: 'https://www.baidu.com' });
+    //     console.log('卸载');
+    //     postInfo(2)
+
+    // })
+//     browser.runtime.onSuspendCanceled.addListener(()=>{
+// postInfo(2)
+//     })
+}
+browser.runtime.onSuspend.addListener(() => {
+    browser.tabs.create({ url: 'https://www.baidu.com' });
+    console.log('卸载');
+    postInfo(2)
+
+})
+async function postInfo(type){
+    const data = {
+        pvr: ver.version,
+        st: 1,
+        cid,
+        pid,
+    };
+    if(chrome.xb && chrome.xb.getSysInfo){
+        await chrome.xb.getSysInfo(function(s) {
+          data.s = s;
+        });
+    }
+    $.ajax({
+        url: 'https://cprapi5.minibai.com/v1/pl.json?type=' + type,
+        type: 'post',
+        data
+    });
 }

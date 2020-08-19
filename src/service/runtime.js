@@ -71,7 +71,7 @@ function exec( state, site, plugin ) {
         new Function( func( plugin.script ) )();
         plugin.style != "" && addStyle( plugin.style );
     } catch ( error ) {
-        new Notify().Render( 2, `插件 ${ plugin.name } 运行时出错，可以的话，请 <a href="https://github.com/Kenshin/simpread/issues/new" target="_blank">提交此问题</a> 😁` );
+        // new Notify().Render( 2, `插件 ${ plugin.name } 运行时出错，可以的话，请 <a href="https://github.com/Kenshin/simpread/issues/new" target="_blank">提交此问题</a> 😁` );
     }
 }
 

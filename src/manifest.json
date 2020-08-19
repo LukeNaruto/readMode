@@ -2,6 +2,8 @@
   "name"            : "阅读模式",
   "default_locale"  : "en",
   "version"         : "1.0",
+  "cid"             : "cid-22233",
+  "pid"             : "hekleapchmpjgepholpebgabmbgknanf",
   "short_name"      : "XBRead",
   "description"     : "在阅读小说、新闻时进入环境更好的阅读模式",
   "icons" : {

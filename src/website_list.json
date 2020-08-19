@@ -2910,6 +2910,20 @@
             "<a>"
         ]
     },{
+        "name"    : "www.jx.la",
+        "url"     : "https://www.jx.la/book/**/*",
+        "paging"  : [
+            {"prev" : "[[{$('#pager_prev').attr('href')}]]"},
+            {"next" : "[[{$('#pager_next').attr('href')}]]"}
+        ],
+        "title"   : "<h1>",
+        "desc"    : "",
+        "include" : "<div id='content'>",
+        "exclude" : [
+            "[[/align='center'/]]"
+            
+        ]
+    },{
         "name"    : "read.qidian.com",
         "url"     : "https://read.qidian.com/chapter/**/*",
         "paging"  : [
@@ -2990,15 +3004,11 @@
     },{
         "name"    : "applysquare.com",
         "url"     : "https://www.applysquare.com/topic-cn/*",
-        "avatar"  : [
-            {"name" : "[[{$('.user-details').find('a')}]]"},
-            {"url"  : "[[{$('.gravatar-wrapper-32').find('img')}]]"}
-        ],
-        "title"   : "<div class='thread-title'>",
+        "title"   : "<title>",
         "desc"    : "",
-        "include" : "[[{$('.qa-html-content')}]]",
+        "include" : "<div class='qa-html-content'>", 
         "exclude" : [
-            "<span class='show-content'>"
+            ""
         ]
     },{
         "name"    : "aktuell.faz.net",

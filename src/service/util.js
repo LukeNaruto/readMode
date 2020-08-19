@@ -266,25 +266,86 @@ function getPageInfo() {
 
 function txt2HtmlAppend2Dom(domStr,site){
     const {include, paging, exclude, title} = site;
-    let $DOM = $(domStr);
+    let $DOM = $('<div data-a="3">').append($(domStr));
+    console.log('txt2HtmlAppend2Dom---',$DOM.find('title').html(),$DOM);
+    
     exclude.forEach(exclu => {
+        console.log('exclude--------',exclu ,formatSelector(exclu));
+        
         $DOM.find(formatSelector(exclu)).remove();
     })
-    const includeDOM = $DOM.find(formatSelector(include)).html();
+    
+    let includeDOM = ''; //$DOM.find(formatSelector(include)).html();//'<div>';
+    $DOM.find(formatSelector(include)) && $DOM.find(formatSelector(include)).each((i,dom)=>{
+        // console.log(i,dom.innerText);
+        includeDOM += dom.outerHTML;
+    });
+    // if(typeof includeDOM )
+    let n = '';
+    const len_ = $.parseHTML(includeDOM).length;
+    $.parseHTML(includeDOM).forEach(function (e, a) {
+        if(len_ > 1){
+            // n += '<div className="item-box">';
+            e.childNodes.forEach((childEl,childA) => {
+                n += parseHTMLDOM(childEl, childA);
+            });
+            // n += '</div>';
+        }else{
+            n += parseHTMLDOM(e, a);
+        }
+        
+    });
+    console.log(includeDOM, $.parseHTML(includeDOM)[0].innerHTML);
+    console.log('---includeDOM---------',$.parseHTML(n).length,$.parseHTML(includeDOM), n);
+    let newN = '';
+    if($.parseHTML(n).length == 1){
+        $.parseHTML(n)[0].childNodes.forEach(function (e, a) {
+            newN += parseHTMLDOM(e, a);
+        });
+    }else{
+        newN = n;
+    }
+    
+    console.log('---n---------',$.parseHTML(n).length,$.parseHTML(n), n);
+
+    function parseHTMLDOM(e, a){
+        var i = e.tagName,
+          o = e.outerText,
+          s = e.outerHTML,
+          t=true,
+          r=false,
+          n = '';
+
+        void 0 == i ? 
+            n += "<p>" + e.textContent.replace(/</gi, "&lt;").replace(/>/gi, "&gt;").replace(/^\n|\n$/gi, "").trim() + "</p>" 
+            : "PRE" == i ? 
+                n += s 
+                : "sr-blocks" == i.toLowerCase() ?
+                     n += s 
+                     : ("" != o || s.includes("<img") || s.includes("<video")) 
+                     && (n += t && 0 == r ? 
+                        s.replace(/ (style|id|class)="[\w ;%@#!-:(),\u4e00-\u9fa5]*"/gi, "") 
+                        : s);
+        return n;
+    }
+
+
     let nextUrl = '';
-    console.log(paging[1].next);
+    console.log(include, includeDOM, $DOM.find(formatSelector(include)),formatSelector(include));
     
     if(paging[1].next){
         nextUrl = getSelectorStr($DOM, paging[1].next, 'attr');
     }
     
     const titleTxt = getSelectorStr($DOM, title, 'text');
-
-    console.log($DOM.find('body'), $DOM.find(formatSelector(include)));
+    // console.log('title--------',$DOM, title, titleTxt);
     
-    console.log(nextUrl, titleTxt);
+
+    // console.log($DOM.find('body'), $DOM.find(formatSelector(include)));
+    
+    // console.log(nextUrl, titleTxt);
     return {
-        include: includeDOM,
+        include: newN,
         next: nextUrl,
         title: titleTxt,
 
@@ -318,7 +379,7 @@ function getSelectorStr($DOM, str, dir){
             const handleStr = (h).split('.attr');// attr
             if(handleStr.length == 2 && bool){
                 const attrName = handleStr[1].replace(/^\(\'|\'\)$/g,'') || '';
-                console.log(handleStr,dir);
+                // console.log(handleStr,dir);
                 _text = $DOM.find(formatSelector(eval(handleStr[0]))).attr(attrName);
             }
             console.log(RegExp.$2);
@@ -326,16 +387,29 @@ function getSelectorStr($DOM, str, dir){
         return _text;
         
     } else if(str.startsWith('<')){
-        return $DOM.find(formatSelector(str)).text();
+        str = formatSelector(str);
+        
+        return $DOM.find(str).text();
     }
 }
 //"<div class='read-content'>" => div.read-content
 function formatSelector(domStr){
     console.log(domStr);
-    
-    const dom = $(domStr);
+    let dom;
+    if(typeof domStr == 'string' && domStr.startsWith("[[/") && domStr.endsWith("/]]")){
+        domStr = domStr.replace(/^\[\[\/|\/\]\]/g, "");
+        return `[${domStr}]`;
+    }else if(typeof domStr == 'string' && domStr.startsWith("[[{") && domStr.endsWith("}]]")){
+        domStr = domStr.replace(/^\[\[\{\$\(\'|\'\)\}\]\]/g, "");
+
+        // dom = eval(domStr);
+        console.log(dom,domStr);
+        return domStr;
+    }else{
+        dom = $(domStr);
+    }
     if(!dom[0]) return null;
-    console.log(dom.attr('class'), dom);
+    // console.log(dom.attr('class'), dom);
     
     const tag = dom[0].nodeName.toLowerCase(),
         classStr = dom.attr('class'),
@@ -344,7 +418,7 @@ function formatSelector(domStr){
         class_ = classNames.length ? '.' + classNames.join('.') : '',
         id_ = idStr ? '#' + idStr : '',
         result = tag + id_ + class_;
-        console.log(result);
+        console.log(result, typeof result);
         
     return result;
 
