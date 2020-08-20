@@ -64,6 +64,7 @@ class SrRead extends React.Component{
 class ImgShowBox extends React.Component {
     imgWidth = 0;
     imgHeight = 0;
+    imgRectStyle = {};
     constructor(props){
         super();
         const {srcImgs, idx} = props;
@@ -190,13 +191,17 @@ class ImgShowBox extends React.Component {
             <li><a href="https://bbs.minibai.com/" title="反馈" target="_blank"><i className="iconfont icon-yuedumoshi_fankui"></i></a> </li>
             <li>{`${ idx + 1 }  |  ${len}`}</li>
         </ul>;
-        const Img = <img ref="curImg" draggable="false" src={src} alt="image" style={{transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />;
+        
         if(!this.imgWidth && !this.imgHeight){
             const images = new Image();
             images.src = src;
             this.imgWidth = images.width;
             this.imgHeight = images.height;
+            const rateRect = this.imgWidth / this.imgHeight;
+            this.imgRectStyle = rateRect > 1 ? {height:`calc(100% / ${rateRect})`} : {width:`calc(100% * ${rateRect})`}
         } 
+        console.log(this.imgRectStyle);
+        const Img = <img ref="curImg" draggable="false" src={src} alt="image" style={{...this.imgRectStyle,transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />;
         return (
             <div ref="closeEl" className="img-show-box">
                 <p className="sub-des">图片大小：{this.imgWidth} <i className="iconfont icon-yuedumoshi_guanbi"></i>  {this.imgHeight}</p>
