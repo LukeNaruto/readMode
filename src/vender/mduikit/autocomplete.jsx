@@ -395,18 +395,19 @@ export default class AC extends React.Component {
     onDropdownClick( event ) {
         const {items, value} = this.props;
         console.log(this.props);
+        const target = event.target.tagName.toLocaleLowerCase() == 'icon' ? event.target.parentNode : event.target;
         
-        if ( event.target.dataset.state == "close" ) {
+        if ( target.dataset.state == "close" ) {
 
             this.onTextChangeFocus(event);
 
             this.setState({ ...this.state, items, icon_: 'icon-Upward-px' });
-            event.target.dataset.state = "open";
+            target.dataset.state = "open";
         } else {
             this.onTextChangeBlur(event);
 
             this.setState({ ...this.state, items: [], icon_: 'icon-down-px' });
-            event.target.dataset.state = "close";
+            target.dataset.state = "close";
         }
     }
 
@@ -475,12 +476,12 @@ export default class AC extends React.Component {
                 {/* <input ref="input" style={ style.input } {...props} /> */}
                 <p ref="dropdown" style={titleStyle} data-state="close" onClick={evt=>this.onDropdownClick(evt)}>
                     {this.state.title}
+                    <icon className={`iconfont ${this.state.icon_}`} style={ style.icon }></icon>
                 </p>
                 <ac-group>
                     <text-field-border style={ style.border }/>
                     <text-field-state style={ style.state }/>
                 </ac-group>
-                <icon className={`iconfont ${this.state.icon_}`} style={ style.icon }></icon>
                 <ListView waves={ this.props.waves } onChange={ (n,v)=>this.onDropdownChange(n,v) }
                     activeColor={ this.props.activeColor } hoverColor={ this.props.hoverColor }
                     active={ this.state.name } items={ this.state.items } />

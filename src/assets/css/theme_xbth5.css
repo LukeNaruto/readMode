@@ -28,7 +28,7 @@ sr-rd-content h1,sr-rd-content h2,sr-rd-content h3,sr-rd-content h4,sr-rd-conten
     background-color: #424343;
     color:#eee;
 }
-sr-read,sr-rd-crlbar.scrolling{
+sr-read,sr-rd-crlbar.scrolling,.toTop{
   background-color: #464747;
 }
 .fap-tool{
@@ -92,6 +92,6 @@ sr-rd-content p code {
 .simpread-multi-root {
     background-color: #424343;
 }
-.simpread-read-root .toTop{
+/* .simpread-read-root .toTop{
     background-color: rgba(0,0,0,.3);
-}
+} */

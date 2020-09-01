@@ -457,9 +457,9 @@ class AudioBox extends React.Component{
                 
                 <span onClick={()=>{$('panel-bg').click();}} className="close iconfont icon-closepx"></span>
                 <div className="play-settings">
-                    <span onClick={()=>{this.playFn('pre')}} className="pre-audio"><i className="iconfont icon-voice-set-backoff-16px"></i></span>
-                    <span onClick={()=>{this.playFn('play')}} className="middle-audio"><i className={`iconfont ${playA ? 'icon-voice-suspend-20px' : 'icon-voice-play-20px'}`}></i></span>
-                    <span onClick={()=>{this.playFn('next')}} className="next-audio"><i className="iconfont icon-voice-set-forward-16px"></i></span>
+                    <span onClick={()=>{this.playFn('pre')}} className="pre-audio"><icon className="iconfont icon-voice-set-backoff-16px"></icon></span>
+                    <span onClick={()=>{this.playFn('play')}} className="middle-audio"><icon className={`iconfont ${playA ? 'icon-voice-suspend-20px' : 'icon-voice-play-20px'}`}></icon></span>
+                    <span onClick={()=>{this.playFn('next')}} className="next-audio"><icon className="iconfont icon-voice-set-forward-16px"></icon></span>
                 </div>
                 <play-rate>
                     <play-label>{desc}</play-label>

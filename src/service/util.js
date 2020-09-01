@@ -210,7 +210,7 @@ function whitelist( minimatch, data ) {
         item = match_(item);
         if ( item.startsWith( "[[/" ) && item.endsWith( "/]]" ) ) {
             return location.href.replace( new RegExp( item.replace( /\[\[\/|\/\]\]/ig, "" ), "g" ), "" ) == "" ? true : false;
-        } else return item.startsWith( "http" ) ? minimatch( url, item ) : ~data.site.name.indexOf(item);
+        } else return item.startsWith( "http" ) ? minimatch( url, item ) : (~item.indexOf(data.site.name) || ~data.site.name.indexOf(item));
     }) != -1 ? true : false;
     console.log('util.Whitelist---',url,data,bool);
     return bool;

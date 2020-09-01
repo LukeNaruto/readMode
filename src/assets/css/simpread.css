@@ -52,7 +52,7 @@ sr-read {
     flex-flow:column nowrap;
     font-family: var(--font-family);
     width: var(--container-width);
-    margin: 40px auto;
+    margin: 40px auto 60px;
     max-width: 1200px;
     padding: 0 60px;
     border-radius: 6px;
@@ -63,8 +63,11 @@ sr-read {
 }
 sr-read * {
     
-    width: auto!important;
+    /* width: auto!important; */
     font-family: inherit!important;
+}
+sr-read svg{
+    display: none!important;
 }
 sr-read img{
     height: auto!important;
@@ -1058,10 +1061,7 @@ simpread-feedback sr-stars-footer {
     width: calc(100% - 260px);
     height: calc(100% - 260px);
 }
-#imgShowBox .show-box > img{
-    max-width: 100%;
-    max-height: 100%;
-}
+  
 .btn-circle{
     position: absolute;
     width: 42px;
@@ -1073,11 +1073,15 @@ simpread-feedback sr-stars-footer {
     color: #fff;
     cursor: pointer;
 }
+.btn-circle:hover{
+    background-color: rgb(74, 74, 74);
+    color: #f8f9f9;
+}
 .btn-close{
     top: 30px;
     right: 30px;
 }
-.btn-close > i{
+.btn-close > icon{
     font-size: 22px;
 }
 .btn-pre:hover, .btn-next:hover{
@@ -1103,7 +1107,7 @@ simpread-feedback sr-stars-footer {
     color: #fff;
 }
 
-.sub-des i{
+.sub-des icon{
     position: relative;
     top: 1px;
     color: #fff;
@@ -1118,14 +1122,14 @@ simpread-feedback sr-stars-footer {
     width: 312px;
     height: 46px;
     padding-left: 42px;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: rgba(42, 42, 42, .5);
     border-radius: 46px;
     box-sizing: border-box;
 }
-.btn-groups > li{
+.btn-groups > xbread-li{
     float: left;
 }
-ul.btn-groups > li {
+xbread-ul.btn-groups > xbread-li {
     float: left;
     height: 100%;
     color: #fff;
@@ -1134,14 +1138,50 @@ ul.btn-groups > li {
     cursor: pointer;
     /* font-size: 20px; */
 }
-ul.btn-groups > li:last-of-type{
+xbread-ul.btn-groups > xbread-li:last-of-type{
     font-size: 14px;
     margin-right: 0;
     cursor: default;
 }
-ul.btn-groups > li a{
+xbread-ul.btn-groups > xbread-li a{
     color: #fff;
 }
-ul.btn-groups > li  i{
+xbread-ul.btn-groups > xbread-li  icon{
     font-size: 24px;
+}
+xbread-ul.btn-groups > xbread-li  icon:hover{
+    color: #a1a1a1;
+}
+
+.img-show-box [class*=" icon-"], .img-show-box [class^=icon-]{
+    line-height: unset;
+}
+
+.sr-rd-content-center * {
+    max-width: 100%;
+}
+xbread-loading{
+    display: block;
+    margin-top: -41px;
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+}
+xbread-loading loading-icon{
+    position: relative;
+    display: inline-block;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAPCAYAAAALWoRrAAABGUlEQVQ4jZWU3U6DQBCFv9nVgsb42/TSGN//dXwAY9KYeKVNSSuU8YKZsm5B4SSTXWA5nDlzgjANZ0AADlZHqOrg4SEIUAKXtkYjDfZsB2ysTlhlgPAcuLY1ZBWz6xpYq2qVEoSMsDTCYApOe+vFCFAAzyJyN0a6AC5sr1kdgG9bvTtJFD+KyG3efgCu6D3zw3ugAprk4wXwANxnVrTAi6rWTlrSeSgJ8dbUjeEGeKLz2e34UNVXJ4hJq+0EQoBP4D1TuxKRGOkz6GjpIjMFFbCkm4enY5tGxCfdGPFULOis8K5rD39rN3zSc7AzhY7CSf/K5H/Y89u+xqPgA/L9ZKjqF7C29yrgzaOQejpL9dgPxVUez81ROoQfUwFVM8rQa0gAAAAASUVORK5CYII=') no-repeat left top;
+    width: 21px;
+    height: 21px;
+    top: 5px;
+    margin-right: 10px;
+    animation: roll 1.5s infinite linear;
+}
+@keyframes roll {
+    0%{
+        transform: rotate(0deg);
+    }
+    100%{
+        transform: rotate(360deg);
+    }
 }

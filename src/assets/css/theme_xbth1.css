@@ -28,7 +28,7 @@ sr-rd-content h1,sr-rd-content h2,sr-rd-content h3,sr-rd-content h4,sr-rd-conten
     background-color: #ececec;
     color:#222;
 }
-sr-read,sr-rd-crlbar.scrolling{
+sr-read,sr-rd-crlbar.scrolling, .toTop{
   background-color: #fbfbfb;
 }
 

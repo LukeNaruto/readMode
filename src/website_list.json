@@ -64,33 +64,6 @@
             "<div class='share-nav'>"
         ]
     },{
-        "name"    : "s.pingwest.com",
-        "url"     : "http*://www.pingwest.com/s/*",
-        "title"   : "<title>",
-        "desc"    : "",
-        "include" : "[[{$($('section.content')[1]).html()}]]",
-        "exclude" : [
-            ""
-        ]
-    },{
-        "name"    : "wire.pingwest.com",
-        "url"     : "http*://www.pingwest.com/wire/",
-        "title"   : "<h1 class='title'>",
-        "desc"    : "",
-        "include" : "<div id='sc-container'>",
-        "exclude" : [
-            "<p class='post-footer-wx'>"
-        ]
-    },{
-        "name"    : "pingwest.com",
-        "url"     : "http*://www.pingwest.com/a/*",
-        "title"   : "<title>",
-        "desc"    : "",
-        "include" : "<article class=\"article-style\">",
-        "exclude" : [
-            "<p class='post-footer-wx'>"
-        ]
-    },{
         "name"    : "jiemian.com",
         "url"     : "http://www.jiemian.com/article/",
         "title"   : "<title>",
@@ -2180,16 +2153,18 @@
             "<ul class='pageBox'>",
             "<span class='authors'>",
             "<a class='scrollLeft'>",
-            "<a class='scrollRight'>"
+            "<a class='scrollRight'>",
+            "<div class='ynetGCom'>"
         ]
     },{
         "name"    : "qianlong.com",
         "url"     : "http://*.qianlong.com/*/*/*.shtml",
         "title"   : "<title>",
         "desc"    : "",
-        "include" : "<div class='article-content'>",
+        "include" : "<div class='z_cen'>",
         "exclude" : [
-            ""
+            "<div class='z_cen_wntj'>",
+            "<div class='visible-lg'>"
         ]
     },{
         "name"    : "duozhi.com",
@@ -2911,7 +2886,7 @@
         ]
     },{
         "name"    : "www.jx.la",
-        "url"     : "https://www.jx.la/book/**/*",
+        "url"     : "https://www.jx.la/book/**/*.html",
         "paging"  : [
             {"prev" : "[[{$('#pager_prev').attr('href')}]]"},
             {"next" : "[[{$('#pager_next').attr('href')}]]"}

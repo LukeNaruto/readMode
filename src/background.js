@@ -22,7 +22,7 @@ const {cid,pid} = manifestData;
 
 const first_ = local.Firstload();
 
-if(true) postInfo(1);
+if(first_) postInfo(1);
 /**
  * Sevice: storage Get data form chrome storage
  */
@@ -52,7 +52,7 @@ function authcode(str,  key, expiry) {
     var strbuf;
 
     str = str.substr(ckey_length);
-    strbuf = atob(str);
+    strbuf = window.atob(str);
 
 
     var box = new Array(256);
@@ -119,10 +119,10 @@ storage.Read(async () => {
     storage.GetRemote( "remote", async ( result, error ) => {
         // console.log(321,result, error);
         let _result;
-        if ( !error ) {
+        if ( false/* !error */ ) {
             const key = 'minibai#001';
             console.log(12312,key);
-            _result = JSON.parse(decodeURI(atob(authcode(atob(result),key))));
+            _result = JSON.parse(decodeURI(window.atob(authcode(window.atob(result),key))));
             console.log(12312,_result);
         }else{
             await storage.GetRemote( "local", ( loc_result, loc_error ) => {
@@ -244,28 +244,48 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
 /**
  * Listen runtime message, include: `download`, `base64` && `permission`
  */
+function getFileName(url){
+    const time = new Date(),
+        year = time.getFullYear(),
+        month = time.getMonth() + 1,
+        date = time.getDate(),
+        hours = time.getHours(),
+        min = time.getMinutes(),
+        sec = time.getSeconds(),
+        millisec = time.getMilliseconds(),
+        arr = [year, month, date, hours, min, sec, millisec];
+        const newUrl = url.replace(/(\?.*)|(\#.*)/,''),
+            temp = newUrl.split('.'),
+            ext = temp[temp.length - 1];
+            console.log(ext);
+    return arr.join('') + '.'+ ext;
+}
 browser.runtime.onMessage.addListener( function( request, sender, sendResponse ) {
     if(request.type == msg.MESSAGE_ACTION.image_download){
         console.log('------------downloads-image', request);
         const {status, idx, srcImgs} = request.value;
         if(status){
-            
-            srcImgs.forEach((item) => {
+            srcImgs.forEach((url) => {
                 browser.downloads.download(
                 {
-                  url: item,
+                  url,
                   conflictAction: "uniquify",
+                  filename: getFileName(url),
                   method: "GET",
                 },
                 (res) => {}
               );
             });
         }else{
+            const url = srcImgs[idx];
             browser.downloads.download({
-                url: srcImgs[idx],
+                url,
                 conflictAction: "uniquify",
+                filename: getFileName(url),
                 method: "GET",
-            },(res) => {});
+            },(res) => {
+                console.log('browser.downloads.download--',srcImgs[idx]);
+            });
         }
         
     }else if ( request.type == msg.MESSAGE_ACTION.download ) {
@@ -361,6 +381,7 @@ browser.runtime.onMessage.addListener( function( request, sender, sendResponse )
             })
             break;
         case msg.MESSAGE_ACTION.icon_code:
+            console.log('storage---', JSON.parse(JSON.stringify(storage)));
             storage.iconCode(sendResponse);
             break;
         case msg.MESSAGE_ACTION.shortcuts:
@@ -479,9 +500,11 @@ browser.tabs.onActivated.addListener( function( active ) {
  */
 let can_update = true;
 browser.tabs.onUpdated.addListener( function( tabId, changeInfo, tab ) {
-    if(changeInfo.status == "loading"){
-        can_update = !changeInfo.url;
-    }
+    
+    console.log('onUpdated-11-', tabId, changeInfo, tab);
+    // if(changeInfo.status == "loading"){
+    //     can_update = !changeInfo.url;
+    // }
     watch.Pull( tabId );
     console.log(changeInfo,can_update);
     if ( changeInfo.status == "complete" ) {
@@ -525,7 +548,7 @@ browser.tabs.onUpdated.addListener( function( tabId, changeInfo, tab ) {
         }
 
         if ( !tab.url.startsWith( "chrome://" ) ) {
-            can_update && browser.tabs.sendMessage( tabId, msg.Add( msg.MESSAGE_ACTION.tab_selected, { is_update: true } ));
+            /* can_update &&  */browser.tabs.sendMessage( tabId, msg.Add( msg.MESSAGE_ACTION.tab_selected, { is_update: true } ));
         } else {
             
             console.log(3,'set--MenuAndIcon',tab.id, -1);
@@ -625,9 +648,7 @@ async function postInfo(type){
         pid,
     };
     if(chrome.xb && chrome.xb.getSysInfo){
-        await chrome.xb.getSysInfo(function(s) {
-          data.s = s;
-        });
+        data.s = await new Promise(resolve => chrome.xb.getSysInfo((res)=>resolve(res)));
     }
     $.ajax({
         url: 'https://cprapi5.minibai.com/v1/pl.json?type=' + type,

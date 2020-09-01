@@ -167,44 +167,58 @@ class ImgShowBox extends React.Component {
                 this.close();
             }
         });
-        
+        window.addEventListener('resize',this.resizeImg.bind(this));
     }
     componentWillUnmount(){
         $('#imgShowBox').unbind('mousewheel', this.scaleImg.bind(this));
         $(this.refs.curImg).unbind();
+        window.removeEventListener('resize',this.resizeImg.bind(this));
+    }
+    resizeImg(){
+        this.setState(pre=>pre);
     }
     render(){
         // todo
         const {state:{src,idx, percent,x,y},len} = this;
-        const Btns = <div>
-            <div onClick={()=>this.close()} className="btn-close btn-circle"><i className="iconfont icon-yuedumoshi_guanbi"></i></div>
-                <div onClick={()=>this.switchImg(0)} className={`btn-pre btn-circle ${len <= 1 && 'disable'}`}>
-                    <i className="iconfont icon-yuedumoshi_youxuanzhuan"></i>
+        const Btns = <React.Fragment>
+            <div onClick={()=>this.close()} className="btn-close btn-circle" title="关闭"><icon className="iconfont icon-yuedumoshi_guanbi"></icon></div>
+                <div onClick={()=>this.switchImg(0)} className={`btn-pre btn-circle${len <= 1 ? ' disable' : ''}`} title="上一张">
+                    <icon className="iconfont icon-yuedumoshi_youxuanzhuan"></icon>
                 </div>
-                <div onClick={()=>this.switchImg(1)} className={`btn-next btn-circle ${len <= 1 && 'disable'}`}>
-                    <i className="iconfont icon-yuedumoshi_zuoxuanzhuan"></i>
+                <div onClick={()=>this.switchImg(1)} className={`btn-next btn-circle${len <= 1 ? ' disable' : ''}`} title="下一张">
+                    <icon className="iconfont icon-yuedumoshi_zuoxuanzhuan"></icon>
                 </div>
-        </div>;
-        const btnGroups = <ul className="btn-groups">
-            <li onClick={()=>this.download(0)}><i className="iconfont icon-yuedumoshi_dantuxiazai"></i></li>
-            <li onClick={()=>this.download(1)} title="在使用批量下载时，请在浏览器设置中关闭“下载前询问每个文件的保存位置，否则会弹出多个下载窗口”"><i className="iconfont icon-yuedumoshi_duotuxiazai"></i></li>
-            <li><a href="https://bbs.minibai.com/" title="反馈" target="_blank"><i className="iconfont icon-yuedumoshi_fankui"></i></a> </li>
-            <li>{`${ idx + 1 }  |  ${len}`}</li>
-        </ul>;
+        </React.Fragment>;
+        const btnGroups = <xbread-ul class="btn-groups">
+            <xbread-li onClick={()=>this.download(0)} title="下载"><icon className="iconfont icon-yuedumoshi_dantuxiazai"></icon></xbread-li>
+            <xbread-li onClick={()=>this.download(1)} title="在使用批量下载时，请在浏览器设置中关闭“下载前询问每个文件的保存位置”，否则会弹出多个下载窗口"><icon className="iconfont icon-yuedumoshi_duotuxiazai"></icon></xbread-li>
+            <xbread-li><a href="https://bbs.minibai.com/" title="反馈" target="_blank"><icon className="iconfont icon-yuedumoshi_fankui"></icon></a> </xbread-li>
+            <xbread-li>{`${ idx + 1 }  |  ${len}`}</xbread-li>
+        </xbread-ul>;
         
         if(!this.imgWidth && !this.imgHeight){
             const images = new Image();
             images.src = src;
             this.imgWidth = images.width;
             this.imgHeight = images.height;
-            const rateRect = this.imgWidth / this.imgHeight;
-            this.imgRectStyle = rateRect > 1 ? {height:`calc(100% / ${rateRect})`} : {width:`calc(100% * ${rateRect})`}
+            
+            // this.imgRectStyle = Object.assign(this.imgRectStyle,{
+            //     width : this.imgWidth  + 'px',
+            //     height: this.imgHeight + 'px'
+            // })
         } 
+        const rateRect = this.imgWidth / this.imgHeight;
+        const {clientWidth, clientHeight} = document.documentElement;
+        const cWidth = clientWidth - 260,cHeight = clientHeight - 260;
+        let maxW = rateRect * cHeight, maxH = cWidth / rateRect;
+        maxW = cWidth > maxW ? maxW : cWidth;
+        maxH = cHeight > maxH ? maxH : cHeight;
+        this.imgRectStyle = rateRect > 1 ? {'max-height':`${maxH}px`,height : this.imgHeight  + 'px', 'max-width': this.imgWidth + 'px'} : {'max-width':`${maxW}px`,width: this.imgWidth + 'px', 'max-height': this.imgHeight  + 'px'};
         console.log(this.imgRectStyle);
         const Img = <img ref="curImg" draggable="false" src={src} alt="image" style={{...this.imgRectStyle,transform: `translate(${x}px, ${y}px) scale(${percent / 100})`}} />;
         return (
             <div ref="closeEl" className="img-show-box">
-                <p className="sub-des">图片大小：{this.imgWidth} <i className="iconfont icon-yuedumoshi_guanbi"></i>  {this.imgHeight}</p>
+                <p className="sub-des">图片大小：{this.imgWidth} <icon className="iconfont icon-yuedumoshi_guanbi"></icon>  {this.imgHeight}</p>
                 <div className="show-box">{Img}</div>
                 {Btns}
                 {btnGroups}
@@ -270,11 +284,10 @@ class Read extends React.Component {
         this.viewImg();
         let scrollCount = 0;
         let unshakeTimer = null;
-        
+        $('.simpread-read-root').on('contextmenu',function(){return false;});
         $root
             .addClass( "simpread-font" )
             .addClass( theme )
-            .on('contextmenu',function(){return false;})
             .find( '.simpread-scroll' )
                 .addClass( theme )
                 .sreffect( { opacity: 1 }, { delay: 100 })
@@ -481,7 +494,7 @@ class Read extends React.Component {
         Exit();
     }
     render() {
-        
+        const loading = this.state.locked ? <xbread-loading><loading-icon />正在加载</xbread-loading> : null;
         return (
             <div className="simpread-scroll">
                 <div id="read_container_" style={{width: '100%', position: 'relative'}}>
@@ -495,7 +508,8 @@ class Read extends React.Component {
                             <SrRead wrapper={html} />
                         ))
                     }
-                    <span className="toTop" ref="toTop" id="toTop"><i className="iconfont icon-yuedumoshi_fanhuidingbu"></i></span>
+                    {loading}
+                    <span className="toTop" ref="toTop" id="toTop"><icon className="iconfont icon-yuedumoshi_fanhuidingbu"></icon></span>
                 </div>
             </div>
             

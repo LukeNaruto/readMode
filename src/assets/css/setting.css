@@ -285,10 +285,28 @@ play-rate line line-bg.toLeft{
     border-radius: 3px;
     text-align: center;
     line-height: 50px;
-    background-color: #f7f7f7;
     z-index: 9;
+    overflow: hidden;
     cursor: pointer;
 }
-.toTop > i{
+.toTop:hover:before{
+    opacity: 1;
+}
+.toTop:before{
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.1);
+    content: '';
+    transition: opacity .3s;
+}
+/* .toTop:hover{
+    background-color: #f7f7f7;
+} */
+.toTop > icon{
     font-size: 24px;
+    line-height: unset;
 }

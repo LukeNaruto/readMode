@@ -64,7 +64,7 @@ sendMessageToTab(msg.MESSAGE_ACTION.read_active, bool => {
       text = mode_switch ? '退出模式' : '进入模式';
       $(this).text(text).attr('title',text)
       browserClick();
-      // window.close();
+      window.close();
     }).text(text).attr('title',text).removeClass('no-support') : null;
   });
 });
